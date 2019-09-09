@@ -1,3 +1,4 @@
+// The navbar; don't need to make it adjust to mobile size cos ain't no-one using this on mobile
 import React, { Component } from "react";
 
 class Navbar extends Component {
