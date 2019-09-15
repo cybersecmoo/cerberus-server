@@ -3,7 +3,7 @@ import CommandList from "../queuedcommand/CommandList.component";
 
 class HomePage extends Component {
   render() {
-    return <CommandList items={[{ name: "hi" }]}></CommandList>;
+    return <CommandList items={[{ name: "SFTP", target: { ip: "192.168.0.1" } }]}></CommandList>;
   }
 }
 

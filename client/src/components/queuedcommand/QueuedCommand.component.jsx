@@ -7,8 +7,14 @@ class QueuedCommand extends Component {
   render() {
     return (
       <ListGroup.Item action variant="dark">
-        <b>Name: </b>
-        {this.props.cmd.name}
+        <span className="cell">
+          <b>Command: </b>
+          {this.props.cmd.name}
+        </span>
+        <span className="cell">
+          <b>Target: </b>
+          {this.props.cmd.target.ip}
+        </span>
       </ListGroup.Item>
     );
   }
