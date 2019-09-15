@@ -1,14 +1,16 @@
 // A single queued command, showing command type, args, and target
 import React, { Component } from "react";
+import "./QueuedCommand.style.scss";
+import ListGroup from "react-bootstrap/ListGroup";
 
 class QueuedCommand extends Component {
   render() {
-    <div className="queuedcommand-summary">
-      <h3>Name: </h3>
-      {this.props.commandType.name}
-      <h3>Args: </h3>
-      {this.props.commandType.argsCount}
-    </div>;
+    return (
+      <ListGroup.Item action variant="dark">
+        <b>Name: </b>
+        {this.props.cmd.name}
+      </ListGroup.Item>
+    );
   }
 }
 

@@ -3,7 +3,7 @@ import React, { Component } from "react";
 
 class Command extends Component {
   render() {
-    return <h1>Queue up a Command</h1>;
+    return <h3>{this.props.cmd.name}</h3>;
   }
 }
 

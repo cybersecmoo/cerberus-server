@@ -1,8 +1,9 @@
 import React, { Component } from "react";
+import CommandList from "../queuedcommand/CommandList.component";
 
 class HomePage extends Component {
   render() {
-    return <div></div>;
+    return <CommandList items={[{ name: "hi" }]}></CommandList>;
   }
 }
 
