@@ -8,9 +8,13 @@ class CommandList extends Component {
   render() {
     return (
       <ListGroup>
+        <h3>Commands</h3>
         {this.props.items.map(item => (
           <QueuedCommand cmd={item}></QueuedCommand>
         ))}
+        <ListGroup.Item action variant="dark">
+          Queue up a new command
+        </ListGroup.Item>
       </ListGroup>
     );
   }

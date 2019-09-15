@@ -1,13 +1,35 @@
 // Displays a target (IP, OS, etc.)
 import React, { Component } from "react";
+import "./Target.style.scss";
+import ListGroup from "react-bootstrap/ListGroup";
 
 class Target extends Component {
   render() {
-    <div className="target-summary">
-      <h3>IP: </h3>
-      {this.props.target.ip}
-      <h3>Details: </h3>
-      {this.props.target.platform}
-    </div>;
+    return (
+      <ListGroup.Item action variant="dark">
+        <div>
+          <span className="cell">
+            <b>ID: </b>
+            {this.props.target.id}
+          </span>
+          <span className="cell">
+            <b>IP: </b>
+            {this.props.target.ip}
+          </span>
+        </div>
+        <div>
+          <span className="cell">
+            <b>Platform: </b>
+            {this.props.target.platform}
+          </span>
+          <span className="cell">
+            <b>Is Admin: </b>
+            {this.props.target.isAdmin.toString()}
+          </span>
+        </div>
+      </ListGroup.Item>
+    );
   }
 }
+
+export default Target;

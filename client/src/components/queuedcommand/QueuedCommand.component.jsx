@@ -2,11 +2,12 @@
 import React, { Component } from "react";
 import "./QueuedCommand.style.scss";
 import ListGroup from "react-bootstrap/ListGroup";
+import Button from "react-bootstrap/Button";
 
 class QueuedCommand extends Component {
   render() {
     return (
-      <ListGroup.Item action variant="dark">
+      <ListGroup.Item variant="dark">
         <span className="cell">
           <b>Command: </b>
           {this.props.cmd.name}
@@ -15,6 +16,7 @@ class QueuedCommand extends Component {
           <b>Target: </b>
           {this.props.cmd.target.ip}
         </span>
+        <Button variant="danger">Delete</Button>
       </ListGroup.Item>
     );
   }
