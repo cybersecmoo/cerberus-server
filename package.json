@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --passWithNoTests",
+    "test": "./node_modules/.bin/mocha --recursive --package package.json --reporter spec",
     "start": "node index.js"
   },
   "author": "",
@@ -12,6 +12,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "config": "^3.2.2",
+    "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "express-validator": "^6.1.1",
     "jsonwebtoken": "^8.5.1",
@@ -19,6 +20,7 @@
     "request": "^2.88.0"
   },
   "devDependencies": {
-    "jest": "^24.9.0"
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0"
   }
 }

@@ -3,6 +3,8 @@ const connectDB = require("./config/db");
 const seedDB = require("./config/seed");
 const setupInitialAdmin = require("./config/init_admin");
 
+require("dotenv").config();
+
 const app = express();
 connectDB();
 seedDB();
