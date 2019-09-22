@@ -1,13 +1,6 @@
 const express = require("express");
-const connectDB = require("./config/db");
-const seedDB = require("./config/seed");
-const setupInitialAdmin = require("./config/init_admin");
 
 require("dotenv").config();
-
-await connectDB();
-await seedDB();
-await setupInitialAdmin();
 
 const app = express();
 

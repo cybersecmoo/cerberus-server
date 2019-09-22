@@ -18,53 +18,61 @@ router.post(
     check("password", "Enter a password").exists()
   ],
   async (req, res) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      console.log("AUDIT: Validation errors in authentication");
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { name, password } = req.body;
+    let returnPayload = { token: "", errors: [] };
+    let returnCode = 200;
 
     try {
-      let user = await User.findOne({ name });
+      const errors = validationResult(req);
 
-      if (!user) {
-        logMessage("AUDIT", "Incorrect username"); // TODO: Log requester IP
-        return res.status(400).json({ errors: [{ msg: "Invalid credentials" }] });
-      }
+      if (!errors.isEmpty()) {
+        returnCode = 400;
+        returnPayload.errors = errors.array();
+      } else {
+        const { name, password } = req.body;
 
-      const isMatched = await bcrypt.compare(password, user.password);
+        let user = await User.findOne({ name });
 
-      if (!isMatched) {
-        logMessage("AUDIT", "Incorrect password"); // TODO: Log requester IP
-        return res.status(400).json({ errors: [{ msg: "Invalid credentials" }] });
-      }
-
-      const payload = {
-        user: {
-          id: user.id,
-          isAdmin: user.isAdmin
+        if (!user) {
+          logMessage("AUDIT", "Incorrect username"); // TODO: Log requester IP
+          returnCode = 400;
+          returnPayload.errors = [{ msg: "Invalid credentials" }];
         }
-      };
 
-      jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
-        if (err) {
-          throw err;
-        } else {
-          if (!user.hasLoggedInYet) {
-            user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
-            await user.save();
-            res.redirect("../users/create_password").json({ token }); // FIXME: Chucks an error atm since we don't have a GET endpoint for create_password yet
-          } else {
-            res.json({ token });
+        const isMatched = await bcrypt.compare(password, user.password);
+
+        if (!isMatched) {
+          logMessage("AUDIT", "Incorrect password"); // TODO: Log requester IP
+          returnCode = 400;
+          returnPayload.errors = [{ msg: "Invalid credentials" }];
+        }
+
+        const payload = {
+          user: {
+            id: user.id,
+            isAdmin: user.isAdmin
           }
-        }
-      });
+        };
+
+        jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
+          if (err) {
+            throw err;
+          } else {
+            returnPayload.token = token;
+
+            if (!user.hasLoggedInYet) {
+              user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
+              await user.save();
+              res.redirect("../users/create_password"); // FIXME: Chucks an error atm since we don't have a GET endpoint for create_password yet
+            }
+          }
+        });
+      }
     } catch (error) {
       logMessage("ERROR", "Server error in authentication: " + error);
-      return res.status(500).send("Server Error");
+      returnCode = 500;
+      returnPayload.errors = [{ msg: "Server Error" }];
+    } finally {
+      return res.status(returnCode).json(returnPayload);
     }
   }
 );

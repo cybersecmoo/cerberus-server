@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const initAdmin = require("./init_admin");
+const seed = require("./seed");
 
 const connectDB = async () => {
   try {
@@ -11,4 +13,14 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+const setupDB = async () => {
+  await connectDB();
+  await initAdmin();
+  await seed();
+};
+
+const shutdown = async () => {
+  await mongoose.disconnect();
+};
+
+module.exports = { setupDB, shutdown };

@@ -4,11 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "mocha test/**/**test.js --timeout 5000",
     "start": "node index.js"
-  },
-  "jest": {
-    "testEnvironment": "node"
   },
   "author": "",
   "license": "ISC",
@@ -23,8 +20,10 @@
     "request": "^2.88.0"
   },
   "devDependencies": {
-    "jest": "^24.9.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^6.2.0",
     "sinon": "^7.4.2",
-    "supertest": "^4.0.2"
+    "sinon-mongoose": "^2.3.0"
   }
 }
