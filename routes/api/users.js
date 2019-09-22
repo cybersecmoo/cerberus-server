@@ -3,7 +3,6 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const auth = require("../../middleware/auth");
 const { BCRYPT_ROUNDS, JWT_EXPIRY } = require("../../config/consts");
 const logMessage = require("../../middleware/logging");
@@ -46,9 +45,6 @@ router.post(
   "/",
   auth,
   [
-    check("name", "Name is required")
-      .not()
-      .isEmpty(),
     check("password", "Enter a password of at least 10 characters").isLength({
       min: 10
     })
@@ -111,8 +107,8 @@ const updatePassword = async req => {
 
 // This will change the user's password (required on first login). User must already be logged in to call this.
 // If user cannot remember their password, then the admin can delete their user and add them again
-router.post(
-  "/create_password",
+router.put(
+  "/update_password",
   auth,
   [
     check("password", "Enter a password of at least 10 characters").isLength({
@@ -120,15 +116,21 @@ router.post(
     })
   ],
   async (req, res) => {
+    const errors = validationResult(req);
     let returnCode = 200;
     let jsonPayload = { errors: [] };
 
     try {
-      const updated = updatePassword(req);
-
-      if (!updated) {
-        jsonPayload.errors = [{ msg: "Could not find specified user" }];
+      if (!errors.isEmpty()) {
         returnCode = 400;
+        jsonPayload.errors = errors;
+      } else {
+        const updated = updatePassword(req);
+
+        if (!updated) {
+          jsonPayload.errors = [{ msg: "Could not find specified user" }];
+          returnCode = 400;
+        }
       }
     } catch (error) {
       console.error(err.message);

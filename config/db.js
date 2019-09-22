@@ -2,7 +2,9 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.DB_URI);
+    console.log("Connecting to DB...");
+    const connectString = encodeURI(process.env.DB_URI);
+    await mongoose.connect(connectString, { useNewUrlParser: true });
   } catch (err) {
     console.error(err.message);
     process.exit(1);

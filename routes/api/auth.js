@@ -8,18 +8,6 @@ const { check, validationResult } = require("express-validator");
 const { BCRYPT_ROUNDS, JWT_EXPIRY } = require("../../config/consts");
 const logMessage = require("../../middleware/logging");
 
-// TODO: This will need authorisation that the requesting user is an admin, or is the same as the user being viewed
-router.get("/", async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select("-password"); // If user not found, does this chuck an exception? Or does it just return null?
-
-    res.json(user);
-  } catch (error) {
-    logMessage("ERROR", "Failed to find user by that ID");
-    res.status(404).send("User not found");
-  }
-});
-
 // Authenticate a user and get their token
 router.post(
   "/",
