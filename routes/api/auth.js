@@ -49,7 +49,7 @@ router.post(
         const payload = {
           user: {
             id: user.id,
-            isAdmin: user.isAdmin
+            isAdmin: user.isAdmin // TODO: Add in some user browser data (SHA-256 hashed) and also put the same in a hardened cookie. To mitigate hijacking.
           }
         };
 

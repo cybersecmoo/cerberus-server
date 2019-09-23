@@ -8,14 +8,16 @@ import Button from "react-bootstrap/Button";
 class CommandList extends Component {
   render() {
     return (
-      <div>
+      <div className="commands">
         <h3>Commands</h3>
         <ListGroup className="command-list">
           {this.props.items.map(item => (
             <QueuedCommand cmd={item}></QueuedCommand>
           ))}
         </ListGroup>
-        <Button variant="success">New</Button>
+        <Button className="newCommand" variant="success">
+          New
+        </Button>
       </div>
     );
   }

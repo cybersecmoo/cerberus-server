@@ -11,7 +11,7 @@ class AppNavbar extends Component {
       <Navbar bg="dark" variant="dark">
         <Navbar.Brand href="/">Cerberus C2</Navbar.Brand>
         <Nav className="mr-auto">
-          <Nav.Link href="#">Log In</Nav.Link>
+          <Nav.Link href="/login">Log In</Nav.Link>
           <Nav.Link href="#">Manage Command Types</Nav.Link>
           <Nav.Link href="#">Add User</Nav.Link>
           <Nav.Link href="/about">About</Nav.Link>

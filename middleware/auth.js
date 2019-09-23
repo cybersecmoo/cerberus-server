@@ -21,7 +21,7 @@ module.exports = async (req, res, next) => {
       // Verify the token itself
       jwt.verify(creds, process.env["JWT_KEY"], (err, decoded) => {
         if (decoded) {
-          req.user = decoded.user;
+          req.user = decoded.user; // TODO: Once the browser fingerprint is added to the JWT in `routes/api/auth`, verify it here by comparing it to the...cookie?
 
           next();
         } else {
