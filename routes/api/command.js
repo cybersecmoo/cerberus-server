@@ -53,7 +53,7 @@ router.post("/create", auth, async (req, res) => {
       res.status(400).json({ errors: [{ msg: "A command type with that name already exists" }] });
     }
   } catch (error) {
-    logMessage("ERROR", "Failed to create command type: " + error); // TODO: Log requester IP
+    logMessage("ERROR", "Failed to create command type: " + error);
     res.status(500).json({ errors: [{ msg: "Failed to create command type" }] });
   }
 });

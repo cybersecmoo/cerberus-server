@@ -6,7 +6,7 @@ module.exports = async (req, res, next) => {
   const authZ = req.header("Authorization");
 
   if (!authZ) {
-    logMessage("AUDIT", "No token supplied"); // TODO: Log requester IP?
+    logMessage("AUDIT", "No token supplied");
     return res.status(401).json({ errors: [{ msg: "No authorization token supplied" }] });
   }
 
@@ -25,13 +25,13 @@ module.exports = async (req, res, next) => {
 
           next();
         } else {
-          logMessage("AUDIT", `Invalid token: ${err}`); // TODO: Log requester IP?
+          logMessage("AUDIT", `Invalid token: ${err}`);
           res.status(401).json({ errors: [{ msg: "Invalid token supplied" }] });
         }
       });
     }
   } else {
-    logMessage("AUDIT", `Malformed AuthZ Header`); // TODO: Log requester IP?
+    logMessage("AUDIT", `Malformed AuthZ Header`);
     res.status(401).json({ errors: [{ msg: "Invalid Header" }] });
   }
 };

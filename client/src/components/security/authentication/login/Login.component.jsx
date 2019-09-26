@@ -19,7 +19,9 @@ class Login extends Component {
     event.preventDefault();
 
     try {
+      console.log("Sending");
       const response = await axios.post("/api/auth/", this.state);
+      console.log(response);
     } catch (err) {
       console.error(err);
     } finally {
@@ -37,6 +39,7 @@ class Login extends Component {
   };
 
   render() {
+    // TODO: Use an Alert component to display errors/warnings
     return (
       <div className="login">
         <h2>Login</h2>
