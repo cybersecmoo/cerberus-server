@@ -2,11 +2,11 @@
 import React, { Component } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
 import "./Login.style.scss";
 import axios from "axios";
 import { connect } from "react-redux";
 import { setAlert } from "../../../../redux/alert/alert.action";
+import PropTypes from "prop-types";
 
 class Login extends Component {
   constructor(props) {
@@ -79,6 +79,10 @@ class Login extends Component {
     );
   }
 }
+
+Login.propTypes = {
+  setAlert: PropTypes.func.isRequired
+};
 
 export default connect(
   null,
