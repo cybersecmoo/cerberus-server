@@ -10,8 +10,7 @@ const logMessage = require("../../middleware/logging");
 
 const getUser = async req => {
   let result = { user: { id: "", isAdmin: false }, errors: [] };
-
-  const { name, password } = req.body;
+  const { name, password } = req.body.user;
 
   try {
     let user = await User.findOne({ name });
@@ -39,10 +38,10 @@ const getUser = async req => {
 router.post(
   "/",
   [
-    check("name", "Name is required")
+    check("user.name", "Name is required")
       .not()
       .isEmpty(),
-    check("password", "Enter a password").exists()
+    check("user.password", "Enter a password").exists()
   ],
   async (req, res) => {
     console.log("received auth request");
@@ -79,7 +78,6 @@ router.post(
               if (!user.hasLoggedInYet) {
                 user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
                 await user.save();
-                res.redirect("../users/create_password"); // FIXME: Chucks an error atm since we don't have a GET endpoint for create_password yet
               }
             }
           });

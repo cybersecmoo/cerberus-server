@@ -2,16 +2,21 @@
 import React, { Component } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
 import "./Login.style.scss";
 import axios from "axios";
+import { connect } from "react-redux";
+import { setAlert } from "../../../../redux/alert/alert.action";
 
 class Login extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      name: "",
-      password: ""
+      user: {
+        name: "",
+        password: ""
+      }
     };
   }
 
@@ -20,14 +25,15 @@ class Login extends Component {
 
     try {
       console.log("Sending");
-      const response = await axios.post("/api/auth/", this.state);
-      console.log(response);
+      const response = await axios.post("/api/auth/", this.state.user);
     } catch (err) {
-      console.error(err);
+      this.props.setAlert(`${err}`, "danger");
     } finally {
       this.setState({
-        name: "",
-        password: ""
+        user: {
+          name: "",
+          password: ""
+        }
       });
     }
   };
@@ -39,7 +45,6 @@ class Login extends Component {
   };
 
   render() {
-    // TODO: Use an Alert component to display errors/warnings
     return (
       <div className="login">
         <h2>Login</h2>
@@ -75,4 +80,7 @@ class Login extends Component {
   }
 }
 
-export default Login;
+export default connect(
+  null,
+  { setAlert }
+)(Login);
