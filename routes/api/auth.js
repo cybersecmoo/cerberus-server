@@ -22,8 +22,7 @@ const getUser = async req => {
       result.errors = [{ msg: "Invalid credentials" }];
     }
 
-    result.user.id = user.id;
-    result.user.isAdmin = user.isAdmin;
+    result.user = user;
   } catch (err) {
     logMessage("AUDIT", "Incorrect username");
     result.errors = [{ msg: "Invalid credentials" }];
@@ -32,9 +31,32 @@ const getUser = async req => {
   }
 };
 
+const createToken = async userResult => {
+  const user = userResult.user;
+  const payload = {
+    user: {
+      id: user.id,
+      isAdmin: user.isAdmin
+    }
+  };
+
+  jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
+    if (err) {
+      throw err;
+    } else {
+      returnPayload.token = token;
+      user.token = token;
+      await user.save();
+
+      if (!user.hasLoggedInYet) {
+        user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
+        await user.save();
+      }
+    }
+  });
+};
+
 // Authenticate a user and get their token
-// TODO: Implement exponential backoff for AuthN requests
-// TODO: Lock out after five attempts
 router.post(
   "/",
   [
@@ -61,26 +83,7 @@ router.post(
           returnCode = 400;
           returnPayload.errors = userResult.errors;
         } else {
-          const user = userResult.user;
-          const payload = {
-            user: {
-              id: user.id,
-              isAdmin: user.isAdmin // TODO: Add in some user browser data (SHA-256 hashed) and also put the same in a hardened cookie. To mitigate hijacking.
-            }
-          };
-
-          jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
-            if (err) {
-              throw err;
-            } else {
-              returnPayload.token = token;
-
-              if (!user.hasLoggedInYet) {
-                user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
-                await user.save();
-              }
-            }
-          });
+          await createToken(userResult);
         }
       }
     } catch (error) {

@@ -22,8 +22,8 @@ module.exports = async (req, res, next) => {
       // Verify the token itself
       jwt.verify(creds, process.env["JWT_KEY"], (err, decoded) => {
         if (decoded) {
-          req.user = decoded.user; // TODO: Once the browser fingerprint is added to the JWT in `routes/api/auth`, verify it here by comparing it to the...cookie?
-          const userInDB = await User.findOne({ name: req.user.name });
+          req.user = decoded.user;
+          const userInDB = await User.findById(req.user.id);
 
           if(userInDB.token !== creds) {
             logMessage("AUDIT", "Invalid token: token does not match database");
