@@ -9,7 +9,7 @@ export default (currentState = INITIAL_STATE, action) => {
     case SET_ALERT:
       return [...currentState, payload];
     case REMOVE_ALERT:
-      return state.filter(alert => alert.id !== payload);
+      return currentState.filter(alert => alert.id !== payload);
     default:
       return currentState;
   }

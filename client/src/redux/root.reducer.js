@@ -1,6 +1,6 @@
-const { combineReducers } = require("redux");
-const userReducer = require("./user/user.reducer");
+import alertReducer from "./alert/alert.reducer";
+import { combineReducers } from "redux";
 
 export default combineReducers({
-  user: userReducer
+  alert: alertReducer
 });
