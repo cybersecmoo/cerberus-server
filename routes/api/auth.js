@@ -66,7 +66,6 @@ router.post(
     check("user.password", "Enter a password").exists()
   ],
   async (req, res) => {
-    console.log("received auth request");
     let returnPayload = { token: "", errors: [] };
     let returnCode = 200;
 
@@ -95,5 +94,25 @@ router.post(
     }
   }
 );
+
+router.delete("/", auth, async (req, res) => {
+  let returnCode = 200;
+  let returnPayload = {
+    errors: []
+  };
+
+  try {
+    const name = req.name;
+    let user = await User.findOne({ name });
+    user.token = "";
+    await user.save();
+  } catch (error) {
+    logMessage("ERROR", `Server error when logging out: ${error}`);
+    returnPayload.errors = [{ msg: "Server Error" }];
+    returnCode = 500;
+  } finally {
+    res.status(returnCode).json(returnPayload);
+  }
+});
 
 module.exports = router;
