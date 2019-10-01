@@ -5,7 +5,7 @@ const INITIAL_STATE = {
   isAuthenticated: null
 };
 
-const userReducer = (currentState = INITIAL_STATE, action) => {
+const authReducer = (currentState = INITIAL_STATE, action) => {
   switch (action.type) {
     case LOGIN:
       localStorage.setItem("token", action.payload.token);
@@ -28,4 +28,4 @@ const userReducer = (currentState = INITIAL_STATE, action) => {
   }
 };
 
-export default userReducer;
+export default authReducer;
