@@ -7,6 +7,11 @@ import "./AppNavbar.style.scss";
 class AppNavbar extends Component {
   render() {
     // TODO: Change navbar links based on user type and whether the user is logged in
+    // Once that's done, run some tests and that should be auth complete. On to the user-management after that.
+
+    // TODO: How do we tell the UI that the user is/is not an admin, without allowing the user to exploit it?
+    // Probably fine to just send it in the login response, as long as the client does not then send its value back to be used by the server (the server should get the
+    // user's admin status from the DB, NOT from JWT or other request fields)
     return (
       <Navbar bg="dark" variant="dark">
         <Navbar.Brand href="/">Cerberus C2</Navbar.Brand>

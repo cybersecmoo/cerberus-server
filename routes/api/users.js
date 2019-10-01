@@ -3,7 +3,7 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
-const auth = require("../../middleware/auth");
+const { standardAuth, adminAuth } = require("../../middleware/auth");
 const { BCRYPT_ROUNDS, JWT_EXPIRY } = require("../../config/consts");
 const logMessage = require("../../middleware/logging");
 
@@ -43,7 +43,7 @@ const createUser = async req => {
 // Registers a user (can only be done by an admin; i.e. users cannot request access themselves)
 router.post(
   "/",
-  auth,
+  [standardAuth, adminAuth],
   [
     check("password", "Enter a password of at least 10 characters").isLength({
       min: 10
@@ -109,7 +109,7 @@ const updatePassword = async req => {
 // If user cannot remember their password, then the admin can delete their user and add them again
 router.put(
   "/update_password",
-  auth,
+  standardAuth,
   [
     check("password", "Enter a password of at least 10 characters").isLength({
       min: 10

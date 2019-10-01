@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../../middleware/auth");
+const { standardAuth } = require("../../middleware/auth");
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -9,7 +9,7 @@ const { BCRYPT_ROUNDS, JWT_EXPIRY } = require("../../config/consts");
 const logMessage = require("../../middleware/logging");
 
 const getUser = async req => {
-  let result = { user: { id: "", isAdmin: false }, errors: [] };
+  let result = { user: { id: "", name: "", isAdmin: false }, errors: [] };
   const { name, password } = req.body.user;
 
   try {
@@ -22,7 +22,11 @@ const getUser = async req => {
       result.errors = [{ msg: "Invalid credentials" }];
     }
 
-    result.user = user;
+    result.user = {
+      id: user.id,
+      name: user.name,
+      isAdmin: user.isAdmin
+    };
   } catch (err) {
     logMessage("AUDIT", "Incorrect username");
     result.errors = [{ msg: "Invalid credentials" }];
@@ -31,12 +35,13 @@ const getUser = async req => {
   }
 };
 
-const createToken = async userResult => {
+const createToken = async (userResult, returnPayload) => {
   const user = userResult.user;
+  returnPayload.isAdmin = user.isAdmin;
   const payload = {
     user: {
       id: user.id,
-      isAdmin: user.isAdmin
+      name: user.name
     }
   };
 
@@ -66,7 +71,7 @@ router.post(
     check("user.password", "Enter a password").exists()
   ],
   async (req, res) => {
-    let returnPayload = { token: "", errors: [] };
+    let returnPayload = { token: "", isAdmin: false, errors: [] };
     let returnCode = 200;
 
     try {
@@ -82,7 +87,7 @@ router.post(
           returnCode = 400;
           returnPayload.errors = userResult.errors;
         } else {
-          await createToken(userResult);
+          await createToken(userResult, returnPayload);
         }
       }
     } catch (error) {
@@ -95,7 +100,7 @@ router.post(
   }
 );
 
-router.delete("/", auth, async (req, res) => {
+router.delete("/", standardAuth, async (req, res) => {
   let returnCode = 200;
   let returnPayload = {
     errors: []

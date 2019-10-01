@@ -3,11 +3,11 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const Command = require("../../models/Command");
 const CommandType = require("../../models/CommandType");
-const auth = require("../../middleware/auth");
+const { standardAuth } = require("../../middleware/auth");
 const logMessage = require("../../middleware/logging");
 
 // Queue up a new command
-router.post("/", auth, async (req, res) => {
+router.post("/", standardAuth, async (req, res) => {
   const { type, args, targetID } = req.body;
 
   try {
@@ -36,8 +36,7 @@ router.post("/", auth, async (req, res) => {
 });
 
 // Create a new type of command
-router.post("/create", auth, async (req, res) => {
-  //TODO: Check that the requesting user is an admin
+router.post("/create", standardAuth, async (req, res) => {
   const { name, argsCount } = req.body;
 
   try {

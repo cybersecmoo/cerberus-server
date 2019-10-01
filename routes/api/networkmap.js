@@ -1,10 +1,10 @@
 const NetworkMap = require("../../models/NetworkMap");
 const express = require("express");
 const router = express.Router();
-const auth = require("../../middleware/auth");
+const { standardAuth } = require("../../middleware/auth");
 
 // Save a network map
-router.post("/", auth, async (req, res) => {
+router.post("/", standardAuth, async (req, res) => {
   const { name, ipRange, nodes, links } = req.body;
   let netMap = await NetworkMap.findOne({ name: name });
 
