@@ -16,6 +16,7 @@ const getUser = async req => {
     let user = await User.findOne({ name });
 
     const isMatched = await bcrypt.compare(password, user.password);
+    console.log(isMatched);
 
     if (!isMatched) {
       logMessage("AUDIT", "Incorrect password");
@@ -24,8 +25,9 @@ const getUser = async req => {
 
     result.user = user;
   } catch (err) {
-    logMessage("AUDIT", "Incorrect username");
+    logMessage("AUDIT", `Incorrect credentials: ${err}`);
     result.errors = [{ msg: "Invalid credentials" }];
+    result.user = { id: null };
   } finally {
     return result;
   }
