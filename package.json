@@ -4,8 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/**/**test.js --timeout 5000",
+    "test": "jest --passWithNoTests",
     "start": "node index.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/client/",
+      "/node_modules/"
+    ]
   },
   "author": "",
   "license": "ISC",
@@ -21,10 +28,8 @@
     "request": "^2.88.0"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "chai-http": "^4.3.0",
-    "mocha": "^6.2.0",
-    "sinon": "^7.4.2",
-    "sinon-mongoose": "^2.3.0"
+    "jest": "^24.9.0",
+    "mockingoose": "^2.13.2",
+    "supertest": "^4.0.2"
   }
 }
