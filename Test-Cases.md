@@ -5,11 +5,11 @@
 ## Authentication ##
 
  - [ ] Valid standard user login
- - [ ] Login causes navbar links to change
- - [ ] Logout causes navbar links to change
+ - [x] Login causes navbar links to change
+ - [x] Logout causes navbar links to change
  - [ ] Invalid login
  - [ ] Valid standard user accessing admin-only endpoint
- - [ ] Admin login
+ - [x] Admin login
  - [ ] Admin accessing admin-only endpoint
  - [ ] Standard user accessing standard user endpoint
 
