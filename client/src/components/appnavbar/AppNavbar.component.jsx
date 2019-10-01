@@ -5,13 +5,19 @@ import { connect } from "react-redux";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import "./AppNavbar.style.scss";
+import { logout } from "../../redux/auth/auth.action";
 
 class AppNavbar extends Component {
+  onLogout = async event => {
+    event.preventDefault();
+    await this.props.logout();
+  };
+
   render() {
     let loginLink = <Nav.Link href="/login">Log In</Nav.Link>;
 
-    if (this.props.isAuthenticated) {
-      loginLink = <Nav.Link href="/logout">Log Out</Nav.Link>;
+    if (this.props.auth.isAuthenticated) {
+      loginLink = <Nav.Link onClick={this.onLogout}>Log Out</Nav.Link>;
     }
 
     return (
@@ -29,11 +35,15 @@ class AppNavbar extends Component {
 }
 
 AppNavbar.propTypes = {
-  isAuthenticated: PropTypes.bool.isRequired
+  auth: PropTypes.object.isRequired,
+  logout: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  isAuthenticated: state.isAuthenticated
+  auth: state.auth
 });
 
-export default connect(mapStateToProps)(AppNavbar);
+export default connect(
+  mapStateToProps,
+  { logout }
+)(AppNavbar);

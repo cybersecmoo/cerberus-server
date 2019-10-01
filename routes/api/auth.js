@@ -62,9 +62,14 @@ router.post(
       } else {
         const userResult = await getUser(req);
 
-        if (!userResult.user.id || userResult.user.token) {
+        if (!userResult.user.id) {
           returnCode = 400;
           returnPayload.errors = userResult.errors;
+
+          return res.status(returnCode).json(returnPayload);
+        } else if (userResult.user.token) {
+          returnCode = 400;
+          returnPayload.errors = [{ msg: "Already Logged in!" }];
 
           return res.status(returnCode).json(returnPayload);
         } else {
@@ -85,7 +90,6 @@ router.post(
               returnPayload.token = token;
               user.token = token;
               await user.save();
-              console.log(returnPayload);
 
               if (!user.hasLoggedInYet) {
                 user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
@@ -113,7 +117,7 @@ router.delete("/", standardAuth, async (req, res) => {
   };
 
   try {
-    const name = req.name;
+    const name = req.user.name;
     let user = await User.findOne({ name });
     user.token = "";
     await user.save();

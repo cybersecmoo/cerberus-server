@@ -5,6 +5,8 @@
 ## Authentication ##
 
  - [ ] Valid standard user login
+ - [ ] Login causes navbar links to change
+ - [ ] Logout causes navbar links to change
  - [ ] Invalid login
  - [ ] Valid standard user accessing admin-only endpoint
  - [ ] Admin login
