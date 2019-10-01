@@ -27,7 +27,7 @@ router.post("/", standardAuth, async (req, res) => {
 });
 
 // Get all network maps
-router.get("/", auth, async (req, res) => {
+router.get("/", standardAuth, async (req, res) => {
   const maps = await NetworkMap.find({});
 
   res.json(maps);

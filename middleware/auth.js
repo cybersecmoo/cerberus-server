@@ -2,11 +2,11 @@ const jwt = require("jsonwebtoken");
 const logMessage = require("./logging");
 const User = require("../models/User");
 
-const isJWT = (authZHeader) => {
+const isJWT = authZHeader => {
   const isJWT = false;
   const parts = authZHeader.split(" ");
-  
-  if(parts.length === 2) {
+
+  if (parts.length === 2) {
     const scheme = parts[0];
     const creds = parts[1];
 
@@ -16,7 +16,7 @@ const isJWT = (authZHeader) => {
   }
 
   return isJWT;
-}
+};
 
 // Handles checking that the user has a valid JWT
 const standardAuth = async (req, res, next) => {
@@ -28,14 +28,14 @@ const standardAuth = async (req, res, next) => {
     return res.status(401).json({ errors: [{ msg: "No authorization token supplied" }] });
   }
 
-  if(isJWT(authZ)) {
+  if (isJWT(authZ)) {
     // Verify the token itself
-    jwt.verify(creds, process.env["JWT_KEY"], (err, decoded) => {
+    jwt.verify(creds, process.env["JWT_KEY"], async (err, decoded) => {
       if (decoded) {
         req.user = decoded.user;
         const userInDB = await User.findById(req.user.id);
 
-        if(userInDB.token !== creds) {
+        if (userInDB.token !== creds) {
           logMessage("AUDIT", "Invalid token: token does not match database");
           return res.status(401).json({ errors: [{ msg: "Invalid token supplied" }] });
         }
@@ -55,14 +55,14 @@ const standardAuth = async (req, res, next) => {
 // Ensures that (given the user is actually a valid one and is logged in etc.) the user is an admin
 const adminAuth = async (req, res, next) => {
   let returnCode = 200;
-  let returnPayload = {errors: []}
+  let returnPayload = { errors: [] };
 
   try {
     const id = req.user.id;
     const user = await User.findById(id);
 
-    if(user) {
-      if(!user.isAdmin) {
+    if (user) {
+      if (!user.isAdmin) {
         logMessage("AUDIT", `User ${user.name} tried to access an admin endpoint`);
         returnCode = 403;
         returnPayload.errors = [{ msg: "Unauthorised" }];
@@ -77,7 +77,7 @@ const adminAuth = async (req, res, next) => {
     returnCode = 500;
     returnPayload.errors = [{ msg: "Server Error" }];
   } finally {
-    if(returnCode === 200) {
+    if (returnCode === 200) {
       next();
     } else {
       return res.status(returnCode).json(returnPayload);
@@ -88,4 +88,4 @@ const adminAuth = async (req, res, next) => {
 module.exports = {
   standardAuth,
   adminAuth
-}
+};

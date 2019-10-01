@@ -10,7 +10,7 @@ const logMessage = require("../../middleware/logging");
 
 const getUser = async req => {
   let result = { user: { id: "", name: "", isAdmin: false }, errors: [] };
-  const { name, password } = req.body.user;
+  const { name, password } = req.body;
 
   try {
     let user = await User.findOne({ name });
@@ -22,11 +22,7 @@ const getUser = async req => {
       result.errors = [{ msg: "Invalid credentials" }];
     }
 
-    result.user = {
-      id: user.id,
-      name: user.name,
-      isAdmin: user.isAdmin
-    };
+    result.user = user;
   } catch (err) {
     logMessage("AUDIT", "Incorrect username");
     result.errors = [{ msg: "Invalid credentials" }];
@@ -36,39 +32,22 @@ const getUser = async req => {
 };
 
 const createToken = async (userResult, returnPayload) => {
-  const user = userResult.user;
-  returnPayload.isAdmin = user.isAdmin;
-  const payload = {
-    user: {
-      id: user.id,
-      name: user.name
-    }
-  };
-
-  jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
-    if (err) {
-      throw err;
-    } else {
-      returnPayload.token = token;
-      user.token = token;
-      await user.save();
-
-      if (!user.hasLoggedInYet) {
-        user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
-        await user.save();
-      }
-    }
-  });
+  try {
+  } catch (error) {
+    logMessage("ERROR", `JWT Signing error: ${error}`);
+    returnPayload.errors = [{ msg: "Server Error" }];
+    return returnPayload;
+  }
 };
 
 // Authenticate a user and get their token
 router.post(
   "/",
   [
-    check("user.name", "Name is required")
+    check("name", "Name is required")
       .not()
       .isEmpty(),
-    check("user.password", "Enter a password").exists()
+    check("password", "Enter a password").exists()
   ],
   async (req, res) => {
     let returnPayload = { token: "", isAdmin: false, errors: [] };
@@ -83,18 +62,45 @@ router.post(
       } else {
         const userResult = await getUser(req);
 
-        if (!userResult.user.id) {
+        if (!userResult.user.id || userResult.user.token) {
           returnCode = 400;
           returnPayload.errors = userResult.errors;
+
+          return res.status(returnCode).json(returnPayload);
         } else {
-          await createToken(userResult, returnPayload);
+          const user = userResult.user;
+
+          returnPayload.isAdmin = user.isAdmin;
+          const payload = {
+            user: {
+              id: user.id,
+              name: user.name
+            }
+          };
+
+          jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
+            if (err) {
+              throw err;
+            } else {
+              returnPayload.token = token;
+              user.token = token;
+              await user.save();
+              console.log(returnPayload);
+
+              if (!user.hasLoggedInYet) {
+                user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
+                await user.save();
+              }
+
+              return res.status(returnCode).json(returnPayload);
+            }
+          });
         }
       }
     } catch (error) {
       logMessage("ERROR", "Server error in authentication: " + error);
       returnCode = 500;
       returnPayload.errors = [{ msg: "Server Error" }];
-    } finally {
       return res.status(returnCode).json(returnPayload);
     }
   }

@@ -17,16 +17,14 @@ class Login extends Component {
     super(props);
 
     this.state = {
-      user: {
-        name: "",
-        password: ""
-      }
+      name: "",
+      password: ""
     };
   }
 
   handleSubmit = async event => {
     event.preventDefault();
-    await this.props.login({ name: this.state.user.name, password: this.state.user.password });
+    await this.props.login({ name: this.state.name, password: this.state.password });
   };
 
   handleChange = event => {
