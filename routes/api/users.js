@@ -59,13 +59,6 @@ router.post(
         returnCode = 400;
         jsonPayload.errors = errors;
       } else {
-        // `req.user` is taken from the decoded JWT
-        if (!req.user.isAdmin) {
-          logMessage("AUDIT", "Non-admin attempting admin tasks");
-          returnCode = 403;
-          jsonPayload.errors = [{ msg: "You must be an admin in order to add users" }];
-        }
-
         const userCreation = await createUser(req);
         user = userCreation.user;
 

@@ -16,7 +16,6 @@ const getUser = async req => {
     let user = await User.findOne({ name });
 
     const isMatched = await bcrypt.compare(password, user.password);
-    console.log(isMatched);
 
     if (!isMatched) {
       logMessage("AUDIT", "Incorrect password");
