@@ -4,10 +4,10 @@
 
 ## Authentication ##
 
- - [ ] Valid standard user login
+ - [x] Valid standard user login
  - [x] Login causes navbar links to change
  - [x] Logout causes navbar links to change
- - [ ] Invalid login
+ - [x] Invalid login
  - [ ] Valid standard user accessing admin-only endpoint
  - [x] Admin login
  - [ ] Admin accessing admin-only endpoint
