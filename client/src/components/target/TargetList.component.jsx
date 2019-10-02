@@ -7,7 +7,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 class TargetList extends Component {
   render() {
     return (
-      <div>
+      <div className="targets">
         <h3>Targets</h3>
         <ListGroup className="target-list">
           {this.props.items.map(item => (

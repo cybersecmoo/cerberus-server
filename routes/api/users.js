@@ -3,44 +3,17 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const auth = require("../../middleware/auth");
+const { standardAuth, adminAuth } = require("../../middleware/auth");
 const { BCRYPT_ROUNDS, JWT_EXPIRY } = require("../../config/consts");
 const logMessage = require("../../middleware/logging");
 
-// Registers a user (can only be done by an admin; i.e. users cannot request access themselves)
-router.post(
-  "/",
-  auth,
-  [
-    check("name", "Name is required")
-      .not()
-      .isEmpty(),
-    check("password", "Enter a password of at least 10 characters").isLength({
-      min: 10
-    })
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
+const createUser = async req => {
+  try {
     const { name, password, isAdmin } = req.body;
+    let user = await User.findOne({ name });
+    let created = false;
 
-    if (!req.user.isAdmin) {
-      logMessage("AUDIT", "Non-admin attempting admin tasks");
-      return res.status(403).json({ errors: [{ msg: "You must be an admin in order to add users" }] });
-    }
-
-    try {
-      let user = await User.findOne({ name });
-
-      if (user) {
-        return res.status(400).json({ errors: [{ msg: "User already exists" }] });
-      }
-
+    if (!user) {
       const salt = await bcrypt.genSalt(BCRYPT_ROUNDS);
       const pw = await bcrypt.hash(password, salt);
 
@@ -51,71 +24,120 @@ router.post(
       });
 
       await user.save();
-
-      const payload = {
-        user: {
-          id: user.id
-        }
-      };
-
-      jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, (err, token) => {
-        if (err) {
-          throw err;
-        } else {
-          res.json({ token });
-        }
-      });
-
-      res.send("User registered");
-    } catch (error) {
-      logMessage("ERROR", "Server error in user registration: " + error);
-      return res.status(500).send("Server Error");
+      created = true;
     }
-  }
-);
 
-// This will change the user's password (required on first login). User must already be logged in to call this.
-// If user cannot remember their password, then the admin can delete their user and add them again
+    const payload = {
+      user: {
+        id: user.id
+      },
+      new: created
+    };
+
+    return payload;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// Registers a user (can only be done by an admin; i.e. users cannot request access themselves)
 router.post(
-  "/create_password",
-  auth,
+  "/",
+  [standardAuth, adminAuth],
   [
     check("password", "Enter a password of at least 10 characters").isLength({
       min: 10
     })
   ],
   async (req, res) => {
+    const errors = validationResult(req);
+    let jsonPayload = { user: "", errors: [] };
+    let returnCode = 201;
+
     try {
-      let user = await User.findById(req.user.id);
-      const { newPW } = req.body;
+      if (!errors.isEmpty()) {
+        returnCode = 400;
+        jsonPayload.errors = errors;
+      } else {
+        // `req.user` is taken from the decoded JWT
+        if (!req.user.isAdmin) {
+          logMessage("AUDIT", "Non-admin attempting admin tasks");
+          returnCode = 403;
+          jsonPayload.errors = [{ msg: "You must be an admin in order to add users" }];
+        }
 
-      if (!user) {
-        return res.status(400).json({ errors: [{ msg: "User does not exist" }] });
+        const userCreation = await createUser(req);
+        user = userCreation.user;
+
+        if (!userCreation.new) {
+          jsonPayload.errors = [{ msg: "User already exists!" }];
+          returnCode = 400;
+        }
+
+        jsonPayload = { user, errors: jsonPayload.errors };
       }
+    } catch (error) {
+      logMessage("ERROR", "Server error in user registration: " + error);
+      returnCode = 500;
+      jsonPayload.errors = [{ msg: "Server Error" }];
+    } finally {
+      return res.status(returnCode).json(jsonPayload);
+    }
+  }
+);
 
-      const salt = await bcrypt.genSalt(BCRYPT_ROUNDS);
-      const pw = await bcrypt.hash(newPW, salt);
+const updatePassword = async req => {
+  let success = true;
+  let user = await User.findById(req.user.id);
+  const { newPW } = req.body;
 
-      user.password = pw;
+  if (!user) {
+    success = false;
+  }
 
-      await user.save();
+  const salt = await bcrypt.genSalt(BCRYPT_ROUNDS);
+  const pw = await bcrypt.hash(newPW, salt);
 
-      const payload = {
-        user: {
-          id: user.id
+  user.password = pw;
+
+  await user.save();
+
+  return success;
+};
+
+// This will change the user's password (required on first login). User must already be logged in to call this.
+// If user cannot remember their password, then the admin can delete their user and add them again
+router.put(
+  "/update_password",
+  standardAuth,
+  [
+    check("password", "Enter a password of at least 10 characters").isLength({
+      min: 10
+    })
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    let returnCode = 200;
+    let jsonPayload = { errors: [] };
+
+    try {
+      if (!errors.isEmpty()) {
+        returnCode = 400;
+        jsonPayload.errors = errors;
+      } else {
+        const updated = updatePassword(req);
+
+        if (!updated) {
+          jsonPayload.errors = [{ msg: "Could not find specified user" }];
+          returnCode = 400;
         }
-      };
-
-      jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, (err, token) => {
-        if (err) {
-          throw err;
-        } else {
-          res.json({ token });
-        }
-      });
+      }
     } catch (error) {
       console.error(err.message);
-      return res.status(500).send("Server Error");
+      jsonPayload.errors = [{ msg: "Server Error" }];
+      returnCode = 500;
+    } finally {
+      return res.status(returnCode).json(jsonPayload);
     }
   }
 );

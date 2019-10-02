@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../../middleware/auth");
+const { standardAuth } = require("../../middleware/auth");
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -8,16 +8,39 @@ const { check, validationResult } = require("express-validator");
 const { BCRYPT_ROUNDS, JWT_EXPIRY } = require("../../config/consts");
 const logMessage = require("../../middleware/logging");
 
-router.get("/", async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select("-password"); // If user not found, does this chuck an exception? Or does it just return null?
+const getUser = async req => {
+  let result = { user: { id: "", name: "", isAdmin: false }, errors: [] };
+  const { name, password } = req.body;
 
-    res.json(user);
-  } catch (error) {
-    logMessage("ERROR", "Failed to find user by that ID");
-    res.status(404).send("User not found");
+  try {
+    let user = await User.findOne({ name });
+
+    const isMatched = await bcrypt.compare(password, user.password);
+    console.log(isMatched);
+
+    if (!isMatched) {
+      logMessage("AUDIT", "Incorrect password");
+      result.errors = [{ msg: "Invalid credentials" }];
+    }
+
+    result.user = user;
+  } catch (err) {
+    logMessage("AUDIT", `Incorrect credentials: ${err}`);
+    result.errors = [{ msg: "Invalid credentials" }];
+    result.user = { id: null };
+  } finally {
+    return result;
   }
-});
+};
+
+const createToken = async (userResult, returnPayload) => {
+  try {
+  } catch (error) {
+    logMessage("ERROR", `JWT Signing error: ${error}`);
+    returnPayload.errors = [{ msg: "Server Error" }];
+    return returnPayload;
+  }
+};
 
 // Authenticate a user and get their token
 router.post(
@@ -29,54 +52,84 @@ router.post(
     check("password", "Enter a password").exists()
   ],
   async (req, res) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      console.log("AUDIT: Validation errors in authentication");
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { name, password } = req.body;
+    let returnPayload = { token: "", isAdmin: false, errors: [] };
+    let returnCode = 200;
 
     try {
-      let user = await User.findOne({ name });
+      const errors = validationResult(req);
 
-      if (!user) {
-        logMessage("AUDIT", "Incorrect username"); // TODO: Log requester IP
-        return res.status(400).json({ errors: [{ msg: "Invalid credentials" }] });
-      }
+      if (!errors.isEmpty()) {
+        returnCode = 400;
+        returnPayload.errors = errors.array();
+      } else {
+        const userResult = await getUser(req);
 
-      const isMatched = await bcrypt.compare(password, user.password);
+        if (!userResult.user.id) {
+          returnCode = 400;
+          returnPayload.errors = userResult.errors;
 
-      if (!isMatched) {
-        logMessage("AUDIT", "Incorrect password"); // TODO: Log requester IP
-        return res.status(400).json({ errors: [{ msg: "Invalid credentials" }] });
-      }
+          return res.status(returnCode).json(returnPayload);
+        } else if (userResult.user.token) {
+          returnCode = 400;
+          returnPayload.errors = [{ msg: "Already Logged in!" }];
 
-      const payload = {
-        user: {
-          id: user.id
-        }
-      };
-
-      jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
-        if (err) {
-          throw err;
+          return res.status(returnCode).json(returnPayload);
         } else {
-          if (!user.hasLoggedInYet) {
-            user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
-            await user.save();
-            res.redirect("../users/create_password").json({ token }); // FIXME: Chucks an error atm since we don't have a GET endpoint for create_password yet
-          } else {
-            res.json({ token });
-          }
+          const user = userResult.user;
+
+          returnPayload.isAdmin = user.isAdmin;
+          const payload = {
+            user: {
+              id: user.id,
+              name: user.name
+            }
+          };
+
+          jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
+            if (err) {
+              throw err;
+            } else {
+              returnPayload.token = token;
+              user.token = token;
+              await user.save();
+
+              if (!user.hasLoggedInYet) {
+                user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
+                await user.save();
+              }
+
+              return res.status(returnCode).json(returnPayload);
+            }
+          });
         }
-      });
+      }
     } catch (error) {
       logMessage("ERROR", "Server error in authentication: " + error);
-      return res.status(500).send("Server Error");
+      returnCode = 500;
+      returnPayload.errors = [{ msg: "Server Error" }];
+      return res.status(returnCode).json(returnPayload);
     }
   }
 );
+
+router.delete("/", standardAuth, async (req, res) => {
+  let returnCode = 200;
+  let returnPayload = {
+    errors: []
+  };
+
+  try {
+    const name = req.user.name;
+    let user = await User.findOne({ name });
+    user.token = "";
+    await user.save();
+  } catch (error) {
+    logMessage("ERROR", `Server error when logging out: ${error}`);
+    returnPayload.errors = [{ msg: "Server Error" }];
+    returnCode = 500;
+  } finally {
+    res.status(returnCode).json(returnPayload);
+  }
+});
 
 module.exports = router;

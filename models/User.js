@@ -20,6 +20,13 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isLockedOut: {
+    type: Boolean,
+    default: false
+  },
+  token: {
+    type: String
+  },
   isAdmin: {
     type: Boolean,
     default: false
