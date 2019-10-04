@@ -7,7 +7,8 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    select: false
   },
   date: {
     type: Date,
@@ -22,7 +23,8 @@ const UserSchema = new mongoose.Schema({
   },
   isLockedOut: {
     type: Boolean,
-    default: false
+    default: false,
+    select: false
   },
   token: {
     type: String

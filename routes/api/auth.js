@@ -13,7 +13,7 @@ const getUser = async req => {
   const { name, password } = req.body;
 
   try {
-    let user = await User.findOne({ name });
+    let user = await User.findOne({ name }).select("+password"); // FIXME: Injectable? Not easily, but worth giving a check when pentesting
 
     const isMatched = await bcrypt.compare(password, user.password);
 

@@ -8,17 +8,17 @@
  - [x] Login causes navbar links to change
  - [x] Logout causes navbar links to change
  - [x] Invalid login
- - [ ] Valid standard user accessing admin-only endpoint
+ - [x] Valid standard user accessing admin-only endpoint
  - [x] Admin login
- - [ ] Admin accessing admin-only endpoint
+ - [x] Admin accessing admin-only endpoint
  - [ ] Standard user accessing standard user endpoint
 
 ## User Management ##
 
- - [ ] Only admins can manage other users
+ - [x] Only admins can manage other users
  - [ ] Delete user
- - [ ] Add user successfully
- - [ ] Add user but with invalid password 
+ - [x] Add user successfully
+ - [x] Add user but with invalid password 
  - [ ] User changing their own password
 
 ## Commands ##

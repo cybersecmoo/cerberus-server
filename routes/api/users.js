@@ -45,6 +45,9 @@ router.post(
   "/",
   [standardAuth, adminAuth],
   [
+    check("name", "Name is required")
+      .not()
+      .isEmpty(),
     check("password", "Enter a password of at least 10 characters").isLength({
       min: 10
     })
@@ -78,6 +81,24 @@ router.post(
     }
   }
 );
+
+// Registers a user (can only be done by an admin; i.e. users cannot request access themselves)
+router.get("/", [standardAuth, adminAuth], async (req, res) => {
+  let jsonPayload = { user: "", errors: [] };
+  let returnCode = 200;
+
+  try {
+    const allUsers = await User.find({});
+
+    jsonPayload = { allUsers, errors: jsonPayload.errors };
+  } catch (error) {
+    logMessage("ERROR", "Server error in getting users: " + error);
+    returnCode = 500;
+    jsonPayload.errors = [{ msg: "Server Error" }];
+  } finally {
+    return res.status(returnCode).json(jsonPayload);
+  }
+});
 
 const updatePassword = async req => {
   let success = true;
