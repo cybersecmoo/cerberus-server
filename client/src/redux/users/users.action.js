@@ -5,7 +5,7 @@ import axios from "axios";
 
 export const deleteUser = id => async dispatch => {
   try {
-    const response = await axios.delete(`/api/users/${id}`, authorizationHeaders());
+    await axios.delete(`/api/users/${id}`, authorizationHeaders());
 
     dispatch({
       type: DELETE_USER,

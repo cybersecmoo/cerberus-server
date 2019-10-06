@@ -4,13 +4,18 @@ import "./UserSummary.style.scss";
 import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+
+import { setAlert } from "../../../../redux/alert/alert.action";
+import { deleteUser } from "../../../../redux/users/users.action";
+
 class UserSummary extends Component {
-  // TODO: this needs to fire off a Redux action, which will delete the user and, if successful, remove the user from the user list component.
-  deleteUser = async event => {
+  deleteClicked = async event => {
     event.preventDefault();
 
     try {
-      console.log(event);
+      deleteUser(this.props.user.id);
     } catch (err) {
       setAlert(err, "danger");
     }
@@ -33,4 +38,10 @@ class UserSummary extends Component {
   }
 }
 
-export default UserSummary;
+UserSummary.propTypes = {
+  setAlert: PropTypes.func.isRequired,
+  deleteUser: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired
+};
+
+export default connect({ setAlert, deleteUser })(UserSummary);
