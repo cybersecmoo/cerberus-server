@@ -34,7 +34,7 @@ export const fetchUsers = () => async dispatch => {
     const response = await axios.get("/api/users/", config);
     dispatch({
       type: FETCH_USERS,
-      payload: response.allUsers
+      payload: response.data.allUsers
     });
   } catch (err) {
     setAlert(err, "danger");

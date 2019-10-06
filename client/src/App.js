@@ -14,7 +14,6 @@ import { Route, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
 
 import store from "./redux/store";
-import UserSummary from "./components/security/admin/usersummary/UserSummary.component";
 
 class App extends Component {
   render() {
@@ -29,7 +28,7 @@ class App extends Component {
               <Route exact path="/about" component={AboutPage} />
               <Route exact path="/commandtype/new" component={NewCommandType} />
               <Route exact path="/login" component={Login} />
-              <Route exact path="/user-management" component={UserSummary} />
+              <Route exact path="/user-management" component={UserList} />
             </Switch>
           </Container>
         </div>

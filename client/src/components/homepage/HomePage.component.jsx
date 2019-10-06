@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import CommandList from "../queuedcommand/CommandList.component";
 import TargetList from "../target/TargetList.component";
-import Netmap from "../netmap/Netmap.component";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 

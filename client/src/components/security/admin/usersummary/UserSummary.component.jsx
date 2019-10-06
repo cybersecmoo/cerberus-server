@@ -12,27 +12,30 @@ import { deleteUser } from "../../../../redux/users/users.action";
 
 class UserSummary extends Component {
   deleteClicked = async event => {
+    console.log("CLICKED");
     event.preventDefault();
 
     try {
-      deleteUser(this.props.user.id);
+      this.props.deleteUser(this.props.user.id);
     } catch (err) {
-      setAlert(err, "danger");
+      this.props.setAlert(err, "danger");
     }
   };
 
   render() {
     return (
-      <ListGroup.Item key={this.props.user.id} variant="dark">
+      <ListGroup.Item eventKey={this.props.key} variant="dark">
         <span className="cell">
           <b>Name: </b>
           {this.props.user.name}
         </span>
         <span className="cell">
           <b>Is Admin: </b>
-          {this.props.user.isAdmin}
+          {this.props.user.isAdmin.toString()}
         </span>
-        <Button variant="danger">Delete</Button>
+        <Button variant="danger" onClick={this.deleteClicked}>
+          Delete
+        </Button>
       </ListGroup.Item>
     );
   }
@@ -44,4 +47,7 @@ UserSummary.propTypes = {
   user: PropTypes.object.isRequired
 };
 
-export default connect({ setAlert, deleteUser })(UserSummary);
+export default connect(
+  null,
+  { setAlert, deleteUser }
+)(UserSummary);
