@@ -34,19 +34,24 @@ const standardAuth = async (req, res, next) => {
   if (isJWT) {
     // Verify the token itself
     jwt.verify(creds, process.env["JWT_KEY"], async (err, decoded) => {
-      if (decoded) {
-        req.user = decoded.user;
-        const userInDB = await User.findById(req.user.id);
+      try {
+        if (decoded) {
+          req.user = decoded.user;
+          const userInDB = await User.findById(req.user.id);
 
-        if (userInDB.token !== creds) {
-          logMessage("AUDIT", "Invalid token: token does not match database");
+          if (userInDB.token !== creds) {
+            logMessage("AUDIT", "Invalid token: token does not match database");
+            return res.status(401).json({ errors: [{ msg: "Invalid token supplied" }] });
+          }
+
+          next();
+        } else {
+          logMessage("AUDIT", `Invalid token: ${err}`);
           return res.status(401).json({ errors: [{ msg: "Invalid token supplied" }] });
         }
-
-        next();
-      } else {
-        logMessage("AUDIT", `Invalid token: ${err}`);
-        return res.status(401).json({ errors: [{ msg: "Invalid token supplied" }] });
+      } catch (err) {
+        logMessage("AUDIT", "Could not find user");
+        return res.status(401).json({ errors: [{ msg: "Could not find user" }] });
       }
     });
   } else {

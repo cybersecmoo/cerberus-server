@@ -15,9 +15,14 @@ class AppNavbar extends Component {
 
   render() {
     let loginLink = <Nav.Link href="/login">Log In</Nav.Link>;
+    let userManLink = null;
 
     if (this.props.auth.isAuthenticated) {
       loginLink = <Nav.Link onClick={this.onLogout}>Log Out</Nav.Link>;
+    }
+
+    if (this.props.auth.isAdmin) {
+      userManLink = <Nav.Link href="/user-management">Manage Users</Nav.Link>;
     }
 
     return (
@@ -26,7 +31,7 @@ class AppNavbar extends Component {
         <Nav className="mr-auto">
           {loginLink}
           <Nav.Link href="#">Manage Command Types</Nav.Link>
-          <Nav.Link href="#">Add User</Nav.Link>
+          {userManLink}
           <Nav.Link href="/about">About</Nav.Link>
         </Nav>
       </Navbar>

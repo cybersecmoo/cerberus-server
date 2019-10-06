@@ -83,6 +83,24 @@ router.post(
 );
 
 // Registers a user (can only be done by an admin; i.e. users cannot request access themselves)
+router.delete("/:id", [standardAuth, adminAuth], async (req, res) => {
+  let jsonPayload = { success: false, errors: [] };
+  let returnCode = 200;
+
+  try {
+    await User.findByIdAndDelete(req.id);
+
+    jsonPayload = { success: true, errors: jsonPayload.errors };
+  } catch (error) {
+    logMessage("ERROR", "Server error in deleting user: " + error);
+    returnCode = 500;
+    jsonPayload.errors = [{ msg: "Server Error" }];
+  } finally {
+    return res.status(returnCode).json(jsonPayload);
+  }
+});
+
+// Registers a user (can only be done by an admin; i.e. users cannot request access themselves)
 router.get("/", [standardAuth, adminAuth], async (req, res) => {
   let jsonPayload = { user: "", errors: [] };
   let returnCode = 200;

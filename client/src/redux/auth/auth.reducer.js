@@ -12,6 +12,7 @@ const authReducer = (currentState = INITIAL_STATE, action) => {
       return {
         ...currentState,
         ...action.payload,
+        isAdmin: action.payload.isAdmin,
         isAuthenticated: true
       };
 
@@ -20,6 +21,7 @@ const authReducer = (currentState = INITIAL_STATE, action) => {
       return {
         ...currentState,
         token: null,
+        isAdmin: false,
         isAuthenticated: false
       };
 
