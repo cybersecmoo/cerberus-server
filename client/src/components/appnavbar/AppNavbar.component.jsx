@@ -6,7 +6,6 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import "./AppNavbar.style.scss";
 import { logout } from "../../redux/auth/auth.action";
-import { Redirect } from "react-router-dom";
 
 class AppNavbar extends Component {
   onLogout = async event => {
@@ -20,8 +19,6 @@ class AppNavbar extends Component {
 
     if (this.props.auth.isAuthenticated) {
       loginLink = <Nav.Link onClick={this.onLogout}>Log Out</Nav.Link>;
-    } else {
-      return <Redirect to="/update-password" />;
     }
 
     if (this.props.auth.isAdmin) {

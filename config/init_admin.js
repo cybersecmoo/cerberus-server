@@ -25,6 +25,8 @@ const setupInitAdmin = async () => {
 
       await initAdmin.save();
     }
+
+    // TODO: Do we want to reset the password if it's been changed? Probably not...
   } catch (err) {
     console.error(err);
   }

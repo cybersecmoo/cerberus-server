@@ -32,13 +32,14 @@ const getUser = async req => {
   }
 };
 
-const createToken = async (userResult, returnPayload) => {
-  try {
-  } catch (error) {
-    logMessage("ERROR", `JWT Signing error: ${error}`);
-    returnPayload.errors = [{ msg: "Server Error" }];
-    return returnPayload;
-  }
+const tokenIsValid = async token => {
+  jwt.verify(token, process.env["JWT_KEY"], async (err, decoded) => {
+    if (err) {
+      return false;
+    } else {
+      return true;
+    }
+  });
 };
 
 // Authenticate a user and get their token
@@ -63,40 +64,41 @@ router.post(
       } else {
         const userResult = await getUser(req);
 
-        if (!userResult.user.id) {
+        if (userResult.errors !== undefined && userResult.errors != 0) {
           returnCode = 400;
           returnPayload.errors = userResult.errors;
 
           return res.status(returnCode).json(returnPayload);
-        } else if (userResult.user.token) {
+        } else if (userResult.user.token && tokenIsValid(userResult.user.token) === true) {
           returnCode = 400;
           returnPayload.errors = [{ msg: "Already Logged in!" }];
 
           return res.status(returnCode).json(returnPayload);
-        } else {
-          const user = userResult.user;
-
-          returnPayload.isAdmin = user.isAdmin;
-          returnPayload.hasLoggedInYet = user.hasLoggedInYet;
-          const payload = {
-            user: {
-              id: user.id,
-              name: user.name
-            }
-          };
-
-          jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
-            if (err) {
-              throw err;
-            } else {
-              returnPayload.token = token;
-              user.token = token;
-              await user.save();
-
-              return res.status(returnCode).json(returnPayload);
-            }
-          });
         }
+
+        // The user does not have a (valid) token
+        const user = userResult.user;
+
+        returnPayload.isAdmin = user.isAdmin;
+        returnPayload.hasLoggedInYet = user.hasLoggedInYet;
+        const payload = {
+          user: {
+            id: user.id,
+            name: user.name
+          }
+        };
+
+        jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
+          if (err) {
+            throw err;
+          } else {
+            returnPayload.token = token;
+            user.token = token;
+            await user.save();
+
+            return res.status(returnCode).json(returnPayload);
+          }
+        });
       }
     } catch (error) {
       logMessage("ERROR", "Server error in authentication: " + error);

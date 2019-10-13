@@ -35,13 +35,8 @@ class Login extends Component {
 
   render() {
     if (this.props.isAuthenticated) {
-      if (this.props.hasLoggedInYet) {
-        return <Redirect to="/" />;
-      } else {
-        return <Redirect to="/update-password" />;
-      }
+      return <Redirect to="/" />;
     } else {
-      // TODO: Handle the first-time-login password update (open a modal dialogue)
       return (
         <div className="login">
           <h2>Login</h2>
