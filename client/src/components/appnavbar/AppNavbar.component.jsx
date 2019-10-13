@@ -6,6 +6,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import "./AppNavbar.style.scss";
 import { logout } from "../../redux/auth/auth.action";
+import { withRouter } from "react-router-dom";
 
 class AppNavbar extends Component {
   onLogout = async event => {
@@ -13,8 +14,18 @@ class AppNavbar extends Component {
     await this.props.logout();
   };
 
+  onLoginClick = event => {
+    event.preventDefault();
+    this.props.history.push("/login");
+  };
+
+  onUserManClick = event => {
+    event.preventDefault();
+    this.props.history.push("/user-management");
+  };
+
   render() {
-    let loginLink = <Nav.Link href="/login">Log In</Nav.Link>;
+    let loginLink = <Nav.Link onClick={this.onLoginClick}>Log In</Nav.Link>;
     let userManLink = null;
 
     if (this.props.auth.isAuthenticated) {
@@ -22,7 +33,7 @@ class AppNavbar extends Component {
     }
 
     if (this.props.auth.isAdmin) {
-      userManLink = <Nav.Link href="/user-management">Manage Users</Nav.Link>;
+      userManLink = <Nav.Link onClick={this.onUserManClick}>Manage Users</Nav.Link>;
     }
 
     return (
@@ -32,7 +43,6 @@ class AppNavbar extends Component {
           {loginLink}
           <Nav.Link href="#">Manage Command Types</Nav.Link>
           {userManLink}
-          <Nav.Link href="/about">About</Nav.Link>
         </Nav>
       </Navbar>
     );
@@ -48,7 +58,9 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(
+const Connected = connect(
   mapStateToProps,
   { logout }
 )(AppNavbar);
+
+export default withRouter(Connected);

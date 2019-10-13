@@ -20,6 +20,7 @@ class ChangePassword extends Component {
   handleSubmit = async event => {
     event.preventDefault();
     await this.props.changePassword({ password: this.state.password });
+    this.props.history.push("/");
   };
 
   handleChange = event => {
@@ -44,7 +45,7 @@ class ChangePassword extends Component {
               required
             />
           </Form.Group>
-          <Button variant="dark" type="submit">
+          <Button variant="dark" type="submit" onClick={this.handleSubmit}>
             Change
           </Button>
         </Form>
@@ -54,11 +55,14 @@ class ChangePassword extends Component {
 }
 
 ChangePassword.propTypes = {
+  hasLoggedInYet: PropTypes.bool.isRequired,
   setAlert: PropTypes.func.isRequired,
   changePassword: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  hasLoggedInYet: state.auth.hasLoggedInYet
+});
 
 export default connect(
   mapStateToProps,

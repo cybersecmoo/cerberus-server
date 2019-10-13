@@ -76,12 +76,10 @@ class Login extends Component {
 Login.propTypes = {
   setAlert: PropTypes.func.isRequired,
   login: PropTypes.func.isRequired,
-  hasLoggedInYet: PropTypes.bool.isRequired,
   isAuthenticated: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
-  hasLoggedInYet: state.auth.hasLoggedInYet,
   isAuthenticated: state.auth.isAuthenticated
 });
 

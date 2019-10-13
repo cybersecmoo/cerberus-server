@@ -11,7 +11,7 @@
  - [x] Valid standard user accessing admin-only endpoint
  - [x] Admin login
  - [x] Admin accessing admin-only endpoint
- - [ ] Standard user accessing standard user endpoint
+ - [x] Standard user accessing standard user endpoint
 
 ## User Management ##
 

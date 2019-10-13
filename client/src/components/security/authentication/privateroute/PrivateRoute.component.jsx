@@ -6,9 +6,10 @@ import { Redirect } from "react-router-dom";
 
 class PrivateRoute extends Component {
   render() {
+    console.log(this.props.auth);
     if (this.props.auth.isAuthenticated) {
       if (this.props.auth.hasLoggedInYet) {
-        return <Route exact path={this.props.path} />;
+        return <Route exact path={this.props.path} component={this.props.component} />;
       } else {
         return <Redirect to="/update-password" />;
       }
@@ -20,7 +21,6 @@ class PrivateRoute extends Component {
 
 PrivateRoute.propTypes = {
   auth: PropTypes.object.isRequired,
-  component: PropTypes.object.isRequired,
   path: PropTypes.string.isRequired
 };
 

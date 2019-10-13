@@ -5,8 +5,6 @@ const INITIAL_STATE = {
 };
 
 const usersReducer = (currentState = INITIAL_STATE, action) => {
-  console.log(action);
-
   switch (action.type) {
     case DELETE_USER:
       const remainingUsers = currentState.allUsers.filter(user => {

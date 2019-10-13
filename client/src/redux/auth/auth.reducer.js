@@ -2,7 +2,8 @@ import { LOGIN, LOGOUT, CHANGE_PASSWORD } from "../types";
 
 const INITIAL_STATE = {
   token: localStorage.getItem("token"),
-  isAuthenticated: false
+  isAuthenticated: false,
+  hasLoggedInYet: false
 };
 
 const authReducer = (currentState = INITIAL_STATE, action) => {
@@ -28,12 +29,8 @@ const authReducer = (currentState = INITIAL_STATE, action) => {
       };
 
     case CHANGE_PASSWORD:
-      localStorage.removeItem("token");
       return {
         ...currentState,
-        token: null,
-        isAdmin: false,
-        isAuthenticated: false,
         hasLoggedInYet: true
       };
 

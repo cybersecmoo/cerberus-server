@@ -80,7 +80,7 @@ router.post(
         const user = userResult.user;
 
         returnPayload.isAdmin = user.isAdmin;
-        returnPayload.hasLoggedInYet = user.hasLoggedInYet;
+        returnPayload.hasLoggedInYet = user.hasChangedPassword;
         const payload = {
           user: {
             id: user.id,

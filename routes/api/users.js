@@ -60,7 +60,7 @@ router.post(
     try {
       if (!errors.isEmpty()) {
         returnCode = 400;
-        jsonPayload.errors = errors;
+        jsonPayload.errors = errors.array();
       } else {
         const userCreation = await createUser(req);
         user = userCreation.user;
@@ -121,14 +121,14 @@ router.get("/", [standardAuth, adminAuth], async (req, res) => {
 const updatePassword = async req => {
   let success = true;
   let user = await User.findById(req.user.id);
-  const { newPW } = req.body;
+  const { newPassword } = req.body;
 
   if (!user) {
     success = false;
   }
 
   const salt = await bcrypt.genSalt(BCRYPT_ROUNDS);
-  const pw = await bcrypt.hash(newPW, salt);
+  const pw = await bcrypt.hash(newPassword, salt);
 
   user.password = pw;
 
@@ -147,7 +147,7 @@ router.post(
   "/update_password",
   standardAuth,
   [
-    check("password", "Enter a password of at least 10 characters").isLength({
+    check("newPassword", "Enter a password of at least 10 characters").isLength({
       min: 10
     })
   ],
@@ -159,7 +159,7 @@ router.post(
     try {
       if (!errors.isEmpty()) {
         returnCode = 400;
-        jsonPayload.errors = errors;
+        jsonPayload.errors = errors.array();
       } else {
         const updated = updatePassword(req);
 
