@@ -51,7 +51,7 @@ router.post(
     check("password", "Enter a password").exists()
   ],
   async (req, res) => {
-    let returnPayload = { token: "", isAdmin: false, errors: [] };
+    let returnPayload = { token: "", isAdmin: false, hasLoggedInYet: false, errors: [] };
     let returnCode = 200;
 
     try {
@@ -77,6 +77,7 @@ router.post(
           const user = userResult.user;
 
           returnPayload.isAdmin = user.isAdmin;
+          returnPayload.hasLoggedInYet = user.hasLoggedInYet;
           const payload = {
             user: {
               id: user.id,
@@ -91,11 +92,6 @@ router.post(
               returnPayload.token = token;
               user.token = token;
               await user.save();
-
-              if (!user.hasLoggedInYet) {
-                user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
-                await user.save();
-              }
 
               return res.status(returnCode).json(returnPayload);
             }

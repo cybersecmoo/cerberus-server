@@ -16,7 +16,7 @@
 ## User Management ##
 
  - [x] Only admins can manage other users
- - [ ] Delete user
+ - [x] Delete user
  - [x] Add user successfully
  - [x] Add user but with invalid password 
  - [ ] User changing their own password

@@ -158,7 +158,6 @@ describe("Auth tests", () => {
   });
 
   it("should get all users", async () => {
-    // TODO: Modify this as necessary
     // Mock out Mongoose methods
     const userToReturn = new User({
       name: "somethign",

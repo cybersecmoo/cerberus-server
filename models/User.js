@@ -17,7 +17,7 @@ const UserSchema = new mongoose.Schema({
   expires: {
     type: Date
   },
-  hasLoggedInYet: {
+  hasChangedPassword: {
     type: Boolean,
     default: false
   },

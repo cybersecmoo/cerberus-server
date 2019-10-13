@@ -132,6 +132,10 @@ const updatePassword = async req => {
 
   user.password = pw;
 
+  if (!user.hasChangedPassword) {
+    user.hasChangedPassword = true;
+  }
+
   await user.save();
 
   return success;
@@ -139,7 +143,7 @@ const updatePassword = async req => {
 
 // This will change the user's password (required on first login). User must already be logged in to call this.
 // If user cannot remember their password, then the admin can delete their user and add them again
-router.put(
+router.post(
   "/update_password",
   standardAuth,
   [

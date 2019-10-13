@@ -1,4 +1,4 @@
-import { LOGIN, LOGOUT } from "../types";
+import { LOGIN, LOGOUT, CHANGE_PASSWORD } from "../types";
 import { setAlert } from "../alert/alert.action";
 import { authorizationHeaders } from "../../helpers/auth";
 import axios from "axios";
@@ -17,6 +17,31 @@ export const login = ({ name, password }) => async dispatch => {
 
     dispatch({
       type: LOGIN,
+      payload: response.data
+    });
+  } catch (error) {
+    const errors = error.response.data.errors;
+
+    if (errors) {
+      errors.forEach(error => dispatch(setAlert(error.msg, "danger")));
+    }
+  }
+};
+
+export const changePassword = ({ password }) => async dispatch => {
+  const config = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  };
+
+  const body = JSON.stringify({ password });
+
+  try {
+    const response = await axios.post("/api/auth/update_password", body, config);
+
+    dispatch({
+      type: CHANGE_PASSWORD,
       payload: response.data
     });
   } catch (error) {

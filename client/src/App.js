@@ -7,6 +7,7 @@ import AboutPage from "./components/aboutpage/AboutPage.component";
 import NewCommandType from "./components/commandtype/NewCommandType.component";
 import Login from "./components/security/authentication/login/Login.component";
 import UserList from "./components/security/admin/usersummary/UserList.component";
+import ChangePassword from "./components/security/authentication/changepassword/ChangePassword.component";
 import AlertBar from "./components/alert/AlertBar.component";
 
 import Container from "react-bootstrap/Container";
@@ -29,6 +30,7 @@ class App extends Component {
               <Route exact path="/commandtype/new" component={NewCommandType} />
               <Route exact path="/login" component={Login} />
               <Route exact path="/user-management" component={UserList} />
+              <Route exact path="/update-password" component={ChangePassword} />
             </Switch>
           </Container>
         </div>

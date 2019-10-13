@@ -35,8 +35,13 @@ class Login extends Component {
 
   render() {
     if (this.props.isAuthenticated) {
-      return <Redirect to="/" />;
+      if (this.props.hasLoggedInYet) {
+        return <Redirect to="/" />;
+      } else {
+        return <Redirect to="/update-password" />;
+      }
     } else {
+      // TODO: Handle the first-time-login password update (open a modal dialogue)
       return (
         <div className="login">
           <h2>Login</h2>
@@ -76,10 +81,12 @@ class Login extends Component {
 Login.propTypes = {
   setAlert: PropTypes.func.isRequired,
   login: PropTypes.func.isRequired,
+  hasLoggedInYet: PropTypes.bool.isRequired,
   isAuthenticated: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
+  hasLoggedInYet: state.auth.hasLoggedInYet,
   isAuthenticated: state.auth.isAuthenticated
 });
 

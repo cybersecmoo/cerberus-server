@@ -2,16 +2,37 @@ import React, { Component } from "react";
 import UserSummary from "./UserSummary.component";
 import "./UserList.style.scss";
 import ListGroup from "react-bootstrap/ListGroup";
+import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { fetchUsers } from "../../../../redux/users/users.action";
 import { setAlert } from "../../../../redux/alert/alert.action";
+import AddUser from "../adduser/AddUser.component";
 
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 class UserList extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showModal: false
+    };
+  }
+
   async componentDidMount() {
     await this.props.fetchUsers();
+  }
+
+  handleShow() {
+    this.setState({
+      showModal: true
+    });
+  }
+
+  handleHide() {
+    this.setState({
+      showModal: false
+    });
   }
 
   render() {
@@ -26,9 +47,13 @@ class UserList extends Component {
               <UserSummary key={item.id} user={item}></UserSummary>
             ))}
           </ListGroup>
-          <Button className="newUser" variant="success">
+          <Button className="newUser" variant="success" onClick={this.handleShow}>
             New
           </Button>
+
+          <Modal show={this.state.showModal} onHide={this.handleHide} centered>
+            <AddUser />
+          </Modal>
         </div>
       );
     } else {
@@ -50,4 +75,4 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   { fetchUsers, setAlert }
-)(UserList); // FIXME: I think the issue might be here?
+)(UserList);

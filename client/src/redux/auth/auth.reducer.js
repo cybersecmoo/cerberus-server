@@ -1,4 +1,4 @@
-import { LOGIN, LOGOUT } from "../types";
+import { LOGIN, LOGOUT, CHANGE_PASSWORD } from "../types";
 
 const INITIAL_STATE = {
   token: localStorage.getItem("token"),
@@ -13,7 +13,8 @@ const authReducer = (currentState = INITIAL_STATE, action) => {
         ...currentState,
         ...action.payload,
         isAdmin: action.payload.isAdmin,
-        isAuthenticated: true
+        isAuthenticated: true,
+        hasLoggedInYet: action.payload.hasLoggedInYet
       };
 
     case LOGOUT:
@@ -22,7 +23,18 @@ const authReducer = (currentState = INITIAL_STATE, action) => {
         ...currentState,
         token: null,
         isAdmin: false,
-        isAuthenticated: false
+        isAuthenticated: false,
+        hasLoggedInYet: false
+      };
+
+    case CHANGE_PASSWORD:
+      localStorage.removeItem("token");
+      return {
+        ...currentState,
+        token: null,
+        isAdmin: false,
+        isAuthenticated: false,
+        hasLoggedInYet: true
       };
 
     default:

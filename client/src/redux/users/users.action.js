@@ -1,4 +1,4 @@
-import { DELETE_USER, FETCH_USERS } from "../types";
+import { DELETE_USER, FETCH_USERS, CREATE_USER } from "../types";
 import { setAlert } from "../alert/alert.action";
 import { authorizationHeaders } from "../../helpers/auth";
 import axios from "axios";
@@ -35,6 +35,26 @@ export const fetchUsers = () => async dispatch => {
     dispatch({
       type: FETCH_USERS,
       payload: response.data.allUsers
+    });
+  } catch (err) {
+    setAlert(err, "danger");
+  }
+};
+
+export const createUser = ({ name, initialPassword, isAdmin }) => async dispatch => {
+  const config = {
+    headers: {
+      "Content-type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  };
+
+  try {
+    const data = { name, initialPassword, isAdmin };
+    const response = await axios.post("/api/users/", data, config);
+    dispatch({
+      type: CREATE_USER,
+      payload: response.data.user
     });
   } catch (err) {
     setAlert(err, "danger");
