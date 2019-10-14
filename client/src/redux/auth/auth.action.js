@@ -1,11 +1,12 @@
 import { LOGIN, LOGOUT, CHANGE_PASSWORD } from "../types";
 import { setAlert } from "../alert/alert.action";
-import { authorizationHeaders } from "../../helpers/auth";
+import { axiosConfig } from "../../helpers/axiosConfig";
 import axios from "axios";
 
 // TODO: Fix error handling; current method doesn't show the verbose messages from the response
 export const login = ({ name, password }) => async dispatch => {
   const config = {
+    ...axiosConfig,
     headers: {
       "Content-type": "application/json"
     }
@@ -32,6 +33,7 @@ export const login = ({ name, password }) => async dispatch => {
 
 export const changePassword = ({ password }) => async dispatch => {
   const config = {
+    ...axiosConfig,
     headers: {
       "Content-type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -58,7 +60,12 @@ export const changePassword = ({ password }) => async dispatch => {
 };
 
 export const logout = () => async dispatch => {
-  const config = authorizationHeaders();
+  const config = {
+    ...axiosConfig,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  };
 
   try {
     const response = await axios.delete("/api/auth/", config);

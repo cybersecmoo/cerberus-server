@@ -6,7 +6,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import "./AppNavbar.style.scss";
 import { logout } from "../../redux/auth/auth.action";
-import { withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 class AppNavbar extends Component {
   onLogout = async event => {
@@ -14,34 +14,40 @@ class AppNavbar extends Component {
     await this.props.logout();
   };
 
-  onLoginClick = event => {
-    event.preventDefault();
-    this.props.history.push("/login");
-  };
-
-  onUserManClick = event => {
-    event.preventDefault();
-    this.props.history.push("/user-management");
-  };
-
   render() {
-    let loginLink = <Nav.Link onClick={this.onLoginClick}>Log In</Nav.Link>;
+    let loginLink = (
+      <Link className="nav-link" to="/login">
+        Log In
+      </Link>
+    );
     let userManLink = null;
 
     if (this.props.auth.isAuthenticated) {
-      loginLink = <Nav.Link onClick={this.onLogout}>Log Out</Nav.Link>;
+      loginLink = (
+        <Link className="nav-link" onClick={this.onLogout}>
+          Log Out
+        </Link>
+      );
     }
 
     if (this.props.auth.isAdmin) {
-      userManLink = <Nav.Link onClick={this.onUserManClick}>Manage Users</Nav.Link>;
+      userManLink = (
+        <Link className="nav-link" to="/user-management">
+          Manage Users
+        </Link>
+      );
     }
 
     return (
       <Navbar bg="dark" variant="dark">
-        <Navbar.Brand href="/">Cerberus C2</Navbar.Brand>
+        <Link className="nav-brand" to="/">
+          Cerberus C2
+        </Link>
         <Nav className="mr-auto">
           {loginLink}
-          <Nav.Link href="#">Manage Command Types</Nav.Link>
+          <Link className="nav-link" to="/">
+            Manage Command Types
+          </Link>
           {userManLink}
         </Nav>
       </Navbar>
@@ -58,9 +64,7 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-const Connected = connect(
+export default connect(
   mapStateToProps,
   { logout }
 )(AppNavbar);
-
-export default withRouter(Connected);
