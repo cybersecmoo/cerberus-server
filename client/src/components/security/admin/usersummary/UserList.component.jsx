@@ -17,6 +17,8 @@ class UserList extends Component {
     this.state = {
       showModal: false
     };
+    this.handleShow = this.handleShow.bind(this);
+    this.handleHide = this.handleHide.bind(this);
   }
 
   async componentDidMount() {
@@ -51,7 +53,7 @@ class UserList extends Component {
             New
           </Button>
 
-          <Modal show={this.state.showModal} onHide={this.handleHide} centered>
+          <Modal size="lg" show={this.state.showModal} onHide={this.handleHide} centered>
             <AddUser />
           </Modal>
         </div>

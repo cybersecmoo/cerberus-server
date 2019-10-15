@@ -52,7 +52,7 @@ router.post(
     check("password", "Enter a password").exists()
   ],
   async (req, res) => {
-    let returnPayload = { token: "", isAdmin: false, hasLoggedInYet: false, errors: [] };
+    let returnPayload = { token: "", errors: [] };
     let returnCode = 200;
 
     try {
@@ -79,12 +79,12 @@ router.post(
         // The user does not have a (valid) token
         const user = userResult.user;
 
-        returnPayload.isAdmin = user.isAdmin;
-        returnPayload.hasLoggedInYet = user.hasChangedPassword;
         const payload = {
           user: {
             id: user.id,
-            name: user.name
+            name: user.name,
+            isAdmin: user.isAdmin,
+            hasLoggedInYet: user.hasChangedPassword
           }
         };
 

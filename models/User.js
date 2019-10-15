@@ -14,9 +14,6 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  expires: {
-    type: Date
-  },
   hasChangedPassword: {
     type: Boolean,
     default: false

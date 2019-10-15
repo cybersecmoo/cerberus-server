@@ -24,6 +24,7 @@ const usersReducer = (currentState = INITIAL_STATE, action) => {
 
     case CREATE_USER:
       const newUsersList = currentState.allUsers.push(action.payload);
+      console.log(currentState);
       return {
         ...currentState,
         allUsers: newUsersList

@@ -24,12 +24,12 @@ class AppNavbar extends Component {
 
     if (this.props.auth.isAuthenticated) {
       loginLink = (
-        <Link className="nav-link" onClick={this.onLogout}>
+        <Link className="nav-link" onClick={this.onLogout} to="#">
           Log Out
         </Link>
       );
     }
-
+    console.log(this.props.auth);
     if (this.props.auth.isAdmin) {
       userManLink = (
         <Link className="nav-link" to="/user-management">

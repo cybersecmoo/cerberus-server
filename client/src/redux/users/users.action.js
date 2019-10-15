@@ -54,7 +54,7 @@ export const fetchUsers = () => async dispatch => {
   }
 };
 
-export const createUser = ({ name, initialPassword, isAdmin }) => async dispatch => {
+export const createUser = ({ name, password, isAdmin }) => async dispatch => {
   const config = {
     ...axiosConfig,
     headers: {
@@ -64,7 +64,7 @@ export const createUser = ({ name, initialPassword, isAdmin }) => async dispatch
   };
 
   try {
-    const data = { name, initialPassword, isAdmin };
+    const data = { name, password, isAdmin };
     const response = await axios.post("/api/users/", data, config);
     const errors = response.data.errors;
 

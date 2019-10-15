@@ -4,6 +4,7 @@ import { axiosConfig } from "../../helpers/axiosConfig";
 import axios from "axios";
 
 // TODO: Fix error handling; current method doesn't show the verbose messages from the response
+// FIXME: Bring all this in line with the new JWT structure
 export const login = ({ name, password }) => async dispatch => {
   const config = {
     ...axiosConfig,

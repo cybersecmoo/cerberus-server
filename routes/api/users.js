@@ -82,7 +82,6 @@ router.post(
   }
 );
 
-// Registers a user (can only be done by an admin; i.e. users cannot request access themselves)
 router.delete("/:id", [standardAuth, adminAuth], async (req, res) => {
   let jsonPayload = { success: false, errors: [] };
   let returnCode = 200;
@@ -100,7 +99,6 @@ router.delete("/:id", [standardAuth, adminAuth], async (req, res) => {
   }
 });
 
-// Registers a user (can only be done by an admin; i.e. users cannot request access themselves)
 router.get("/", [standardAuth, adminAuth], async (req, res) => {
   let jsonPayload = { user: "", errors: [] };
   let returnCode = 200;
@@ -131,6 +129,7 @@ const updatePassword = async req => {
   const pw = await bcrypt.hash(newPassword, salt);
 
   user.password = pw;
+  user.token = ""; // We invalidate the existing token
 
   if (!user.hasChangedPassword) {
     user.hasChangedPassword = true;

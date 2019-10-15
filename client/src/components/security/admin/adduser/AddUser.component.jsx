@@ -28,6 +28,7 @@ class AddUser extends Component {
 
   handleChange = event => {
     const { value, name } = event.target;
+    console.log(this.state);
 
     this.setState({ [name]: value });
   };

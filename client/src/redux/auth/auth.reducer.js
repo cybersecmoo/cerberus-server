@@ -1,44 +1,64 @@
 import { LOGIN, LOGOUT, CHANGE_PASSWORD } from "../types";
 import isEmpty from "../../helpers/isEmpty";
+import jwt from "jsonwebtoken";
 
-// We keep things in localStorage so that they persist between page reloads
+// We assume the JWT is valid, since it's from the server. Any validation checks here could be bypassed anyway because client-side things. Authorisation
+// decisions aren't made using this anyway. Worst that can happen is that the user might be able to see empty pages if they tamper with the JWT
+const decodeToken = token => {
+  let decoded = { user: { id: "", name: "", isAdmin: false, hasLoggedInYet: false } };
+
+  if (!isEmpty(token)) {
+    decoded = jwt.decode(token);
+  }
+
+  return decoded;
+};
+
 const INITIAL_STATE = {
   token: localStorage.getItem("token"),
-  isAuthenticated: !isEmpty(localStorage.getItem("token")),
-  hasLoggedInYet: !isEmpty(localStorage.getItem("hasLoggedInYet"))
+  user: decodeToken(localStorage.getItem("token")).user,
+  isAuthenticated: !isEmpty(localStorage.getItem("token"))
 };
 
 const authReducer = (currentState = INITIAL_STATE, action) => {
   switch (action.type) {
     case LOGIN:
       localStorage.setItem("token", action.payload.token);
-      localStorage.setItem("hasLoggedInYet", action.payload.hasLoggedInYet);
 
       return {
         ...currentState,
         ...action.payload,
-        isAdmin: action.payload.isAdmin,
-        isAuthenticated: true,
-        hasLoggedInYet: action.payload.hasLoggedInYet
+        isAuthenticated: true
       };
 
     case LOGOUT:
       localStorage.removeItem("token");
-      localStorage.removeItem("hasLoggedInYet");
 
       return {
         ...currentState,
         token: null,
-        isAdmin: false,
-        isAuthenticated: false,
-        hasLoggedInYet: false
+        user: {
+          id: "",
+          name: "",
+          isAdmin: false,
+          hasLoggedInYet: false
+        },
+        isAuthenticated: false
       };
 
     case CHANGE_PASSWORD:
-      localStorage.setItem("hasLoggedInYet", true);
+      localStorage.removeItem("token");
+
       return {
         ...currentState,
-        hasLoggedInYet: true
+        token: null,
+        user: {
+          id: "",
+          name: "",
+          isAdmin: false,
+          hasLoggedInYet: false
+        },
+        isAuthenticated: false
       };
 
     default:
