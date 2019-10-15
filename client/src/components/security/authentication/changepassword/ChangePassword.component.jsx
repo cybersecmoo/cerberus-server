@@ -61,7 +61,7 @@ ChangePassword.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  hasLoggedInYet: state.auth.hasLoggedInYet
+  hasLoggedInYet: state.auth.user.hasLoggedInYet
 });
 
 export default connect(

@@ -21,11 +21,18 @@ class AppNavbar extends Component {
       </Link>
     );
     let userManLink = null;
+    let changePasswordLink = null;
 
     if (this.props.auth.isAuthenticated) {
       loginLink = (
         <Link className="nav-link" onClick={this.onLogout} to="#">
           Log Out
+        </Link>
+      );
+
+      changePasswordLink = (
+        <Link className="nav-link" to="/update-password">
+          Change Password
         </Link>
       );
     }
@@ -49,6 +56,7 @@ class AppNavbar extends Component {
             Manage Command Types
           </Link>
           {userManLink}
+          {changePasswordLink}
         </Nav>
       </Navbar>
     );

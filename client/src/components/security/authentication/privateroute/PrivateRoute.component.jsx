@@ -8,7 +8,7 @@ class PrivateRoute extends Component {
   render() {
     console.log(this.props.auth);
     if (this.props.auth.isAuthenticated) {
-      if (this.props.auth.hasLoggedInYet) {
+      if (this.props.auth.user.hasLoggedInYet) {
         return <Route exact path={this.props.path} component={this.props.component} />;
       } else {
         return <Redirect to="/update-password" />;
