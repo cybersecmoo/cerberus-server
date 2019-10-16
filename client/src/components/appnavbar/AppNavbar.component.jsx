@@ -22,8 +22,9 @@ class AppNavbar extends Component {
     );
     let userManLink = null;
     let changePasswordLink = null;
+    const auth = this.props.auth;
 
-    if (this.props.auth.isAuthenticated) {
+    if (auth.isAuthenticated) {
       loginLink = (
         <Link className="nav-link" onClick={this.onLogout} to="#">
           Log Out
@@ -36,8 +37,8 @@ class AppNavbar extends Component {
         </Link>
       );
     }
-    console.log(this.props.auth);
-    if (this.props.auth.isAdmin) {
+
+    if (auth.user.isAdmin) {
       userManLink = (
         <Link className="nav-link" to="/user-management">
           Manage Users

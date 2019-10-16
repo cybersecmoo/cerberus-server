@@ -27,7 +27,8 @@ const authReducer = (currentState = INITIAL_STATE, action) => {
 
       return {
         ...currentState,
-        ...action.payload,
+        token: action.payload.token,
+        user: decodeToken(action.payload.token).user,
         isAuthenticated: true
       };
 

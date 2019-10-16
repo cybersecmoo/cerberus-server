@@ -46,7 +46,7 @@ class UserList extends Component {
           <h3>Users</h3>
           <ListGroup className="user-list">
             {this.props.allUsers.map(item => (
-              <UserSummary key={item.id} user={item}></UserSummary>
+              <UserSummary key={item._id} user={item}></UserSummary>
             ))}
           </ListGroup>
           <Button className="newUser" variant="success" onClick={this.handleShow}>

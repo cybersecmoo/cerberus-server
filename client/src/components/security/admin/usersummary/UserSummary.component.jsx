@@ -12,11 +12,10 @@ import { deleteUser } from "../../../../redux/users/users.action";
 
 class UserSummary extends Component {
   deleteClicked = async event => {
-    console.log("CLICKED");
     event.preventDefault();
 
     try {
-      this.props.deleteUser(this.props.user.id);
+      this.props.deleteUser(this.props.user._id);
     } catch (err) {
       this.props.setAlert(err, "danger");
     }

@@ -37,7 +37,7 @@ const standardAuth = async (req, res, next) => {
       try {
         if (decoded) {
           req.user = decoded.user;
-          const userInDB = await User.findById(req.user.id);
+          const userInDB = await User.findById(req.user.id).select("+token");
 
           if (userInDB.token !== creds) {
             logMessage("AUDIT", "Invalid token: token does not match database");

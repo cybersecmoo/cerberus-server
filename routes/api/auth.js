@@ -9,12 +9,11 @@ const { BCRYPT_ROUNDS, JWT_EXPIRY } = require("../../config/consts");
 const logMessage = require("../../middleware/logging");
 
 const getUser = async req => {
-  let result = { user: { id: "", name: "", isAdmin: false }, errors: [] };
+  let result = { user: { id: "", name: "", isAdmin: false, hasChangedPassword: false, token: "" }, errors: [] };
   const { name, password } = req.body;
 
   try {
-    let user = await User.findOne({ name }).select("+password"); // FIXME: Injectable? Not easily, but worth giving a check when pentesting
-
+    let user = await User.findOne({ name }).select("+password +hasChangedPassword +token"); // FIXME: Injectable? Not easily, but worth giving a check when pentesting
     const isMatched = await bcrypt.compare(password, user.password);
 
     if (!isMatched) {
@@ -32,14 +31,18 @@ const getUser = async req => {
   }
 };
 
-const tokenIsValid = async token => {
-  jwt.verify(token, process.env["JWT_KEY"], async (err, decoded) => {
-    if (err) {
-      return false;
-    } else {
-      return true;
+const tokenIsValid = token => {
+  let valid = false;
+
+  if (token) {
+    const decoded = jwt.verify(token, process.env["JWT_KEY"]);
+
+    if (decoded) {
+      valid = true;
     }
-  });
+  }
+
+  return valid;
 };
 
 // Authenticate a user and get their token
@@ -63,21 +66,19 @@ router.post(
         returnPayload.errors = errors.array();
       } else {
         const userResult = await getUser(req);
+        const user = userResult.user;
+        const validToken = await tokenIsValid(user.token);
 
         if (userResult.errors !== undefined && userResult.errors != 0) {
           returnCode = 400;
           returnPayload.errors = userResult.errors;
 
           return res.status(returnCode).json(returnPayload);
-        } else if (userResult.user.token && tokenIsValid(userResult.user.token) === true) {
-          returnCode = 400;
-          returnPayload.errors = [{ msg: "Already Logged in!" }];
+        } else if (user.token && validToken === true) {
+          returnPayload.token = user.token;
 
           return res.status(returnCode).json(returnPayload);
         }
-
-        // The user does not have a (valid) token
-        const user = userResult.user;
 
         const payload = {
           user: {

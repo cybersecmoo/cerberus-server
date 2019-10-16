@@ -12,11 +12,13 @@ const UserSchema = new mongoose.Schema({
   },
   date: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    select: false
   },
   hasChangedPassword: {
     type: Boolean,
-    default: false
+    default: false,
+    select: false
   },
   isLockedOut: {
     type: Boolean,
@@ -24,7 +26,8 @@ const UserSchema = new mongoose.Schema({
     select: false
   },
   token: {
-    type: String
+    type: String,
+    select: false
   },
   isAdmin: {
     type: Boolean,

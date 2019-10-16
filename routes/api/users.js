@@ -87,9 +87,14 @@ router.delete("/:id", [standardAuth, adminAuth], async (req, res) => {
   let returnCode = 200;
 
   try {
-    await User.findByIdAndDelete(req.id);
+    const removed = await User.findByIdAndDelete(req.params.id);
 
-    jsonPayload = { success: true, errors: jsonPayload.errors };
+    if (removed === undefined || removed === null) {
+      returnCode = 500;
+      jsonPayload = { success: false, errors: [{ msg: `Could not remove user with id ${req.params.id}` }] };
+    } else {
+      jsonPayload = { success: true, errors: jsonPayload.errors };
+    }
   } catch (error) {
     logMessage("ERROR", "Server error in deleting user: " + error);
     returnCode = 500;
