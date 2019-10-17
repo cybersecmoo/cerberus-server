@@ -7,6 +7,8 @@ const INITIAL_STATE = {
 const usersReducer = (currentState = INITIAL_STATE, action) => {
   switch (action.type) {
     case DELETE_USER:
+      console.log(currentState.allUsers);
+      console.log(action.payload);
       const remainingUsers = currentState.allUsers.filter(user => {
         return user.id !== action.payload.id;
       });
@@ -24,7 +26,6 @@ const usersReducer = (currentState = INITIAL_STATE, action) => {
 
     case CREATE_USER:
       const newUsersList = currentState.allUsers.push(action.payload);
-      console.log(currentState);
       return {
         ...currentState,
         allUsers: newUsersList
