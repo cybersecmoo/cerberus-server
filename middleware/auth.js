@@ -19,6 +19,22 @@ const isValidJWT = authZHeader => {
   return { isJWT, creds };
 };
 
+const removeToken = async token => {
+  const decoded = jwt.decode(token);
+  const user = User.findById(decoded.user.id);
+
+  if (user) {
+    user.token = "";
+    await user.save();
+  }
+};
+
+const jwtErrorResponse = res => {
+  logMessage("AUDIT", "Invalid token");
+  res.status(401).json({ errors: [{ msg: "Invalid token supplied" }] });
+};
+
+// FIXME: if the token has expired, ideally this won't fail, and will just remove that token from the user document in the DB
 // Handles checking that the user has a valid JWT
 const standardAuth = async (req, res, next) => {
   // get token from header
@@ -34,24 +50,30 @@ const standardAuth = async (req, res, next) => {
   if (isJWT) {
     // Verify the token itself
     jwt.verify(creds, process.env["JWT_KEY"], async (err, decoded) => {
-      if (decoded) {
-        req.user = decoded.user;
-        const userInDB = await User.findById(req.user.id);
+      try {
+        if (decoded) {
+          req.user = decoded.user;
+          const userInDB = await User.findById(req.user.id).select("+token");
 
-        if (userInDB.token !== creds) {
-          logMessage("AUDIT", "Invalid token: token does not match database");
-          return res.status(401).json({ errors: [{ msg: "Invalid token supplied" }] });
+          if (userInDB.token !== creds) {
+            jwtErrorResponse(res);
+          }
+
+          next();
+        } else {
+          jwtErrorResponse(res);
         }
-
-        next();
-      } else {
-        logMessage("AUDIT", `Invalid token: ${err}`);
-        return res.status(401).json({ errors: [{ msg: "Invalid token supplied" }] });
+      } catch (err) {
+        // TODO: How do we handle this in terms of whether we return an error, or just call `next()`?
+        if (typeof err === "TokenExpiredError") {
+          removeToken(creds);
+        } else {
+          jwtErrorResponse(res);
+        }
       }
     });
   } else {
-    logMessage("AUDIT", `Malformed AuthZ Header`);
-    return res.status(401).json({ errors: [{ msg: "Invalid Header" }] });
+    jwtErrorResponse(res);
   }
 };
 

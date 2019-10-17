@@ -9,14 +9,12 @@ const { BCRYPT_ROUNDS, JWT_EXPIRY } = require("../../config/consts");
 const logMessage = require("../../middleware/logging");
 
 const getUser = async req => {
-  let result = { user: { id: "", name: "", isAdmin: false }, errors: [] };
+  let result = { user: { id: "", name: "", isAdmin: false, hasChangedPassword: false, token: "" }, errors: [] };
   const { name, password } = req.body;
 
   try {
-    let user = await User.findOne({ name });
-
+    let user = await User.findOne({ name }).select("+password +hasChangedPassword +token"); // FIXME: Injectable? Not easily, but worth giving a check when pentesting
     const isMatched = await bcrypt.compare(password, user.password);
-    console.log(isMatched);
 
     if (!isMatched) {
       logMessage("AUDIT", "Incorrect password");
@@ -33,13 +31,18 @@ const getUser = async req => {
   }
 };
 
-const createToken = async (userResult, returnPayload) => {
-  try {
-  } catch (error) {
-    logMessage("ERROR", `JWT Signing error: ${error}`);
-    returnPayload.errors = [{ msg: "Server Error" }];
-    return returnPayload;
+const tokenIsValid = token => {
+  let valid = false;
+
+  if (token) {
+    const decoded = jwt.verify(token, process.env["JWT_KEY"]);
+
+    if (decoded) {
+      valid = true;
+    }
   }
+
+  return valid;
 };
 
 // Authenticate a user and get their token
@@ -52,7 +55,7 @@ router.post(
     check("password", "Enter a password").exists()
   ],
   async (req, res) => {
-    let returnPayload = { token: "", isAdmin: false, errors: [] };
+    let returnPayload = { token: "", errors: [] };
     let returnCode = 200;
 
     try {
@@ -63,45 +66,40 @@ router.post(
         returnPayload.errors = errors.array();
       } else {
         const userResult = await getUser(req);
+        const user = userResult.user;
+        const validToken = await tokenIsValid(user.token);
 
-        if (!userResult.user.id) {
+        if (userResult.errors !== undefined && userResult.errors != 0) {
           returnCode = 400;
           returnPayload.errors = userResult.errors;
 
           return res.status(returnCode).json(returnPayload);
-        } else if (userResult.user.token) {
-          returnCode = 400;
-          returnPayload.errors = [{ msg: "Already Logged in!" }];
+        } else if (user.token && validToken === true) {
+          returnPayload.token = user.token;
 
           return res.status(returnCode).json(returnPayload);
-        } else {
-          const user = userResult.user;
-
-          returnPayload.isAdmin = user.isAdmin;
-          const payload = {
-            user: {
-              id: user.id,
-              name: user.name
-            }
-          };
-
-          jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
-            if (err) {
-              throw err;
-            } else {
-              returnPayload.token = token;
-              user.token = token;
-              await user.save();
-
-              if (!user.hasLoggedInYet) {
-                user.hasLoggedInYet = true; // FIXME: This sets even if they don't change their password
-                await user.save();
-              }
-
-              return res.status(returnCode).json(returnPayload);
-            }
-          });
         }
+
+        const payload = {
+          user: {
+            id: user.id,
+            name: user.name,
+            isAdmin: user.isAdmin,
+            hasLoggedInYet: user.hasChangedPassword
+          }
+        };
+
+        jwt.sign(payload, process.env["JWT_KEY"], { expiresIn: JWT_EXPIRY }, async (err, token) => {
+          if (err) {
+            throw err;
+          } else {
+            returnPayload.token = token;
+            user.token = token;
+            await user.save();
+
+            return res.status(returnCode).json(returnPayload);
+          }
+        });
       }
     } catch (error) {
       logMessage("ERROR", "Server error in authentication: " + error);

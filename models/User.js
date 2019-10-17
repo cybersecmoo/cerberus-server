@@ -7,25 +7,27 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    select: false
   },
   date: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    select: false
   },
-  expires: {
-    type: Date
-  },
-  hasLoggedInYet: {
+  hasChangedPassword: {
     type: Boolean,
-    default: false
+    default: false,
+    select: false
   },
   isLockedOut: {
     type: Boolean,
-    default: false
+    default: false,
+    select: false
   },
   token: {
-    type: String
+    type: String,
+    select: false
   },
   isAdmin: {
     type: Boolean,

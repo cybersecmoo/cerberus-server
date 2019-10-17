@@ -45,6 +45,9 @@ router.post(
   "/",
   [standardAuth, adminAuth],
   [
+    check("name", "Name is required")
+      .not()
+      .isEmpty(),
     check("password", "Enter a password of at least 10 characters").isLength({
       min: 10
     })
@@ -57,15 +60,8 @@ router.post(
     try {
       if (!errors.isEmpty()) {
         returnCode = 400;
-        jsonPayload.errors = errors;
+        jsonPayload.errors = errors.array();
       } else {
-        // `req.user` is taken from the decoded JWT
-        if (!req.user.isAdmin) {
-          logMessage("AUDIT", "Non-admin attempting admin tasks");
-          returnCode = 403;
-          jsonPayload.errors = [{ msg: "You must be an admin in order to add users" }];
-        }
-
         const userCreation = await createUser(req);
         user = userCreation.user;
 
@@ -86,19 +82,63 @@ router.post(
   }
 );
 
+router.delete("/:id", [standardAuth, adminAuth], async (req, res) => {
+  let jsonPayload = { success: false, errors: [] };
+  let returnCode = 200;
+
+  try {
+    const removed = await User.findByIdAndDelete(req.params.id);
+
+    if (removed === undefined || removed === null) {
+      returnCode = 500;
+      jsonPayload = { success: false, errors: [{ msg: `Could not remove user with id ${req.params.id}` }] };
+    } else {
+      jsonPayload = { success: true, errors: jsonPayload.errors };
+    }
+  } catch (error) {
+    logMessage("ERROR", "Server error in deleting user: " + error);
+    returnCode = 500;
+    jsonPayload.errors = [{ msg: "Server Error" }];
+  } finally {
+    return res.status(returnCode).json(jsonPayload);
+  }
+});
+
+router.get("/", [standardAuth, adminAuth], async (req, res) => {
+  let jsonPayload = { user: "", errors: [] };
+  let returnCode = 200;
+
+  try {
+    const allUsers = await User.find({});
+
+    jsonPayload = { allUsers, errors: jsonPayload.errors };
+  } catch (error) {
+    logMessage("ERROR", "Server error in getting users: " + error);
+    returnCode = 500;
+    jsonPayload.errors = [{ msg: "Server Error" }];
+  } finally {
+    return res.status(returnCode).json(jsonPayload);
+  }
+});
+
 const updatePassword = async req => {
   let success = true;
   let user = await User.findById(req.user.id);
-  const { newPW } = req.body;
+  const { newPassword } = req.body;
 
   if (!user) {
     success = false;
   }
 
   const salt = await bcrypt.genSalt(BCRYPT_ROUNDS);
-  const pw = await bcrypt.hash(newPW, salt);
+  const pw = await bcrypt.hash(newPassword, salt);
 
   user.password = pw;
+  user.token = ""; // We invalidate the existing token
+
+  if (!user.hasChangedPassword) {
+    user.hasChangedPassword = true;
+  }
 
   await user.save();
 
@@ -107,11 +147,11 @@ const updatePassword = async req => {
 
 // This will change the user's password (required on first login). User must already be logged in to call this.
 // If user cannot remember their password, then the admin can delete their user and add them again
-router.put(
+router.post(
   "/update_password",
   standardAuth,
   [
-    check("password", "Enter a password of at least 10 characters").isLength({
+    check("newPassword", "Enter a password of at least 10 characters").isLength({
       min: 10
     })
   ],
@@ -123,7 +163,7 @@ router.put(
     try {
       if (!errors.isEmpty()) {
         returnCode = 400;
-        jsonPayload.errors = errors;
+        jsonPayload.errors = errors.array();
       } else {
         const updated = updatePassword(req);
 

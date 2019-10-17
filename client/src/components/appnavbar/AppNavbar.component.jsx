@@ -6,6 +6,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import "./AppNavbar.style.scss";
 import { logout } from "../../redux/auth/auth.action";
+import { Link } from "react-router-dom";
 
 class AppNavbar extends Component {
   onLogout = async event => {
@@ -14,20 +15,49 @@ class AppNavbar extends Component {
   };
 
   render() {
-    let loginLink = <Nav.Link href="/login">Log In</Nav.Link>;
+    let loginLink = (
+      <Link className="nav-link" to="/login">
+        Log In
+      </Link>
+    );
+    let userManLink = null;
+    let changePasswordLink = null;
+    const auth = this.props.auth;
 
-    if (this.props.auth.isAuthenticated) {
-      loginLink = <Nav.Link onClick={this.onLogout}>Log Out</Nav.Link>;
+    if (auth.isAuthenticated) {
+      loginLink = (
+        <Link className="nav-link" onClick={this.onLogout} to="#">
+          Log Out
+        </Link>
+      );
+
+      changePasswordLink = (
+        <Link className="nav-link" to="/update-password">
+          Change Password
+        </Link>
+      );
+    }
+
+    if (auth.user.isAdmin) {
+      userManLink = (
+        <Link className="nav-link" to="/user-management">
+          Manage Users
+        </Link>
+      );
     }
 
     return (
       <Navbar bg="dark" variant="dark">
-        <Navbar.Brand href="/">Cerberus C2</Navbar.Brand>
+        <Link className="nav-brand" to="/">
+          Cerberus C2
+        </Link>
         <Nav className="mr-auto">
           {loginLink}
-          <Nav.Link href="#">Manage Command Types</Nav.Link>
-          <Nav.Link href="#">Add User</Nav.Link>
-          <Nav.Link href="/about">About</Nav.Link>
+          <Link className="nav-link" to="/">
+            Manage Command Types
+          </Link>
+          {userManLink}
+          {changePasswordLink}
         </Nav>
       </Navbar>
     );

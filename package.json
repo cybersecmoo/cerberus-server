@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --passWithNoTests",
+    "test": "snyk test && jest --passWithNoTests",
     "start": "node index.js"
   },
   "jest": {
@@ -18,18 +18,20 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "config": "^3.2.2",
-    "dotenv": "^8.1.0",
+    "config": "^3.2.3",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "express-validator": "^6.1.1",
+    "express-validator": "^6.2.0",
     "jsonwebtoken": "^8.5.1",
     "lightship": "^4.3.1",
     "mongoose": "^5.7.5",
     "request": "^2.88.0"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "jest": "^24.9.0",
     "mockingoose": "^2.13.2",
+    "snyk": "^1.235.1",
     "supertest": "^4.0.2"
   }
 }
