@@ -35,10 +35,18 @@ const tokenIsValid = token => {
   let valid = false;
 
   if (token) {
-    const decoded = jwt.verify(token, process.env["JWT_KEY"]);
+    try {
+      const decoded = jwt.verify(token, process.env["JWT_KEY"]);
 
-    if (decoded) {
-      valid = true;
+      if (decoded) {
+        valid = true;
+      }
+    } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        valid = false;
+      } else {
+        throw err;
+      }
     }
   }
 
@@ -126,7 +134,7 @@ router.delete("/", standardAuth, async (req, res) => {
     returnPayload.errors = [{ msg: "Server Error" }];
     returnCode = 500;
   } finally {
-    res.status(returnCode).json(returnPayload);
+    return res.status(returnCode).json(returnPayload);
   }
 });
 

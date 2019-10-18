@@ -60,7 +60,7 @@ class AddUser extends Component {
             />
           </Form.Group>
           <Form.Group controlId="createUserIsAdmin">
-            <Form.Check name="isAdmin" type="checkbox" label="Is Admin" />
+            <Form.Check name="isAdmin" value="true" type="checkbox" label="Is Admin" onChange={this.handleChange} />
           </Form.Group>
           <Button variant="dark" type="submit">
             Create User

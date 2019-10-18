@@ -19,22 +19,11 @@ const isValidJWT = authZHeader => {
   return { isJWT, creds };
 };
 
-const removeToken = async token => {
-  const decoded = jwt.decode(token);
-  const user = User.findById(decoded.user.id);
-
-  if (user) {
-    user.token = "";
-    await user.save();
-  }
-};
-
 const jwtErrorResponse = res => {
   logMessage("AUDIT", "Invalid token");
   res.status(401).json({ errors: [{ msg: "Invalid token supplied" }] });
 };
 
-// FIXME: if the token has expired, ideally this won't fail, and will just remove that token from the user document in the DB
 // Handles checking that the user has a valid JWT
 const standardAuth = async (req, res, next) => {
   // get token from header
@@ -64,12 +53,7 @@ const standardAuth = async (req, res, next) => {
           jwtErrorResponse(res);
         }
       } catch (err) {
-        // TODO: How do we handle this in terms of whether we return an error, or just call `next()`?
-        if (typeof err === "TokenExpiredError") {
-          removeToken(creds);
-        } else {
-          jwtErrorResponse(res);
-        }
+        jwtErrorResponse(res);
       }
     });
   } else {
