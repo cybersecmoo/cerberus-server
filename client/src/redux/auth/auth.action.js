@@ -1,4 +1,4 @@
-import { LOGIN, LOGOUT, CHANGE_PASSWORD } from "../types";
+import { LOGIN, LOGOUT, LOCAL_LOGOUT, CHANGE_PASSWORD } from "../types";
 import { setAlert } from "../alert/alert.action";
 import { axiosConfig } from "../../helpers/axiosConfig";
 import axios from "axios";
@@ -54,6 +54,17 @@ export const changePassword = ({ password }) => async dispatch => {
         payload: response.data
       });
     }
+  } catch (error) {
+    dispatch(setAlert(`${error}`, "danger"));
+  }
+};
+
+export const localLogout = () => async dispatch => {
+  try {
+    dispatch({
+      type: LOCAL_LOGOUT,
+      payload: null
+    });
   } catch (error) {
     dispatch(setAlert(`${error}`, "danger"));
   }

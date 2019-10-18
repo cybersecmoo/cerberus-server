@@ -71,6 +71,7 @@ export const createUser = ({ name, password, isAdmin }) => async dispatch => {
     if (errors.length !== 0) {
       errors.forEach(error => dispatch(setAlert(error.msg, "danger")));
     } else {
+      dispatch(setAlert(`Added user ${name}`, "success"));
       dispatch({
         type: CREATE_USER,
         payload: response.data.user

@@ -1,4 +1,4 @@
-import { LOGIN, LOGOUT, CHANGE_PASSWORD } from "../types";
+import { LOGIN, LOGOUT, CHANGE_PASSWORD, LOCAL_LOGOUT } from "../types";
 import isEmpty from "../../helpers/isEmpty";
 import jwt from "jsonwebtoken";
 
@@ -10,7 +10,8 @@ const decodeToken = token => {
   if (!isEmpty(token)) {
     const decoded = jwt.decode(token);
 
-    if (decoded.exp > Date.now()) {
+    // expiry is in seconds since UNIX epoch
+    if (decoded.exp * 1000 > Date.now()) {
       toke = decoded;
     }
   }
@@ -18,9 +19,7 @@ const decodeToken = token => {
   return toke;
 };
 
-// FIXME: log the user out if their token has expired
 const INITIAL_STATE = {
-  token: localStorage.getItem("token"),
   user: decodeToken(localStorage.getItem("token")).user,
   isAuthenticated: !isEmpty(decodeToken(localStorage.getItem("token")).user.id)
 };
@@ -32,9 +31,24 @@ const authReducer = (currentState = INITIAL_STATE, action) => {
 
       return {
         ...currentState,
-        token: action.payload.token,
         user: decodeToken(action.payload.token).user,
         isAuthenticated: true
+      };
+
+    // This removes the locally-stored token, which will then prompt the user to log in again
+    // This helps when the token has expired (re-login will renew the token in the DB)
+    case LOCAL_LOGOUT:
+      localStorage.removeItem("token");
+
+      return {
+        ...currentState,
+        user: {
+          id: "",
+          name: "",
+          isAdmin: false,
+          hasLoggedInYet: false
+        },
+        isAuthenticated: false
       };
 
     case LOGOUT:
@@ -42,7 +56,6 @@ const authReducer = (currentState = INITIAL_STATE, action) => {
 
       return {
         ...currentState,
-        token: null,
         user: {
           id: "",
           name: "",
@@ -57,7 +70,6 @@ const authReducer = (currentState = INITIAL_STATE, action) => {
 
       return {
         ...currentState,
-        token: null,
         user: {
           id: "",
           name: "",

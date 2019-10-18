@@ -29,7 +29,9 @@ const createUser = async req => {
 
     const payload = {
       user: {
-        id: user.id
+        _id: user._id,
+        name: user.name,
+        isAdmin: user.isAdmin
       },
       new: created
     };

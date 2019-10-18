@@ -206,40 +206,4 @@ describe("Auth tests", () => {
     expect(res.status).to.be.equal(200);
     expect(res.body.allUsers[0]).to.not.have.property("password");
   });
-
-  it("should delete a user", async () => {
-    // Mock out Mongoose methods
-    const userToReturn = new User({
-      name: "somethign",
-      isAdmin: true,
-      password: "firstHash",
-      token: "tokentoken.tokeny.sig"
-    });
-
-    // This allows us to return different things from the mock, based on the user for whom the query is looking
-    const finderMock = query => {
-      if (query.getQuery().name === "somethign") {
-        return userToReturn;
-      } else if (query.getQuery().name === "other thing") {
-        return null;
-      } else if (query.getQuery()._id === "id2") {
-        return userToReturn;
-      }
-
-      return userToReturn;
-    };
-    mockingoose(User).toReturn(finderMock, "findOne");
-    mockingoose(User).toReturn({ _id: "id" }, "save");
-    mockingoose(User).toReturn(userToReturn, "delete");
-
-    // Also mock out the jwt hash-comparison; this returns a successful result
-    jest
-      .spyOn(jwt, "verify")
-      .mockImplementationOnce((jwt, key, cb) => cb(null, { user: { id: "id2", name: "somethign" } }));
-
-    const res = await request(app)
-      .delete("/api/users/someID")
-      .set("Authorization", "Bearer tokentoken.tokeny.sig");
-    expect(res.status).to.be.equal(200);
-  });
 });
