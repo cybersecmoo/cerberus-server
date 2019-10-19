@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const mockingoose = require("mockingoose").default;
 const expect = require("chai").expect;
 
-describe("Auth tests", () => {
+describe("User tests", () => {
   afterEach(() => {
     mockingoose.resetAll();
     jest.restoreAllMocks();
@@ -19,7 +19,6 @@ describe("Auth tests", () => {
       password: "firstHash",
       token: "tokentoken.tokeny.sig"
     });
-    const userToCreate = new User({ name: "other thing", isAdmin: false, password: "firstHash" });
 
     // This allows us to return different things from the mock, based on the user for whom the query is looking
     const finderMock = query => {

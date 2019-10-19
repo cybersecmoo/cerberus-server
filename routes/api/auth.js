@@ -59,7 +59,9 @@ router.post(
   [
     check("name", "Name is required")
       .not()
-      .isEmpty(),
+      .isEmpty()
+      .trim()
+      .escape(),
     check("password", "Enter a password").exists()
   ],
   async (req, res) => {

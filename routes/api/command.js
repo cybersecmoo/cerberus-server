@@ -35,7 +35,7 @@ router.post("/", standardAuth, async (req, res) => {
   }
 });
 
-router.get("/types", standardAuth, async (req, res) => {
+router.get("/types/", standardAuth, async (req, res) => {
   let jsonPayload = { allCommandTypes: [], errors: [] };
   let returnCode = 200;
   try {
@@ -52,26 +52,56 @@ router.get("/types", standardAuth, async (req, res) => {
 });
 
 // Create a new type of command
-router.post("/types/create", standardAuth, async (req, res) => {
-  const { name, argsCount } = req.body;
+router.post(
+  "/types/",
+  standardAuth,
+  [
+    check("name", "Name is required")
+      .not()
+      .isEmpty()
+      .trim()
+      .escape(),
+    check("argsCount", "Needs a non-negative number of arguments")
+      .toInt()
+      .custom(value => {
+        return value >= 0;
+      })
+  ],
+  async (req, res) => {
+    let returnPayload = { commandType: {}, errors: [] };
+    let returnCode = 200;
+    const { name, argsCount } = req.body;
+    const errors = validationResult(req);
 
-  try {
-    // Check that no commands with the same name already exist
-    let commandType = await CommandType.findOne({ name });
-
-    if (!commandType) {
-      commandType = new CommandType({ name, argsCount });
-      await commandType.save();
-
-      res.status(201).json(commandType);
+    if (!errors.isEmpty() || argsCount < 0) {
+      returnCode = 400;
+      returnPayload.errors = errors.array();
     } else {
-      res.status(400).json({ errors: [{ msg: "A command type with that name already exists" }] });
+      try {
+        // Check that no commands with the same name already exist
+        let commandType = await CommandType.findOne({ name });
+
+        if (!commandType) {
+          commandType = new CommandType({ name, argsCount });
+          await commandType.save();
+
+          returnCode = 201;
+          returnPayload.errors = [];
+          returnPayload.commandType = commandType;
+        } else {
+          returnCode = 400;
+          returnPayload.errors = [{ msg: "A command type with that name already exists" }];
+        }
+      } catch (error) {
+        logMessage("ERROR", "Failed to create command type: " + error);
+        returnCode = 500;
+        returnPayload.errors = [{ msg: "Failed to create command type" }];
+      }
     }
-  } catch (error) {
-    logMessage("ERROR", "Failed to create command type: " + error);
-    res.status(500).json({ errors: [{ msg: "Failed to create command type" }] });
+
+    res.status(returnCode).json(returnPayload);
   }
-});
+);
 
 router.delete("/types/:id", standardAuth, async (req, res) => {});
 

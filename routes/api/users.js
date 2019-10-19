@@ -49,7 +49,9 @@ router.post(
   [
     check("name", "Name is required")
       .not()
-      .isEmpty(),
+      .isEmpty()
+      .trim()
+      .escape(),
     check("password", "Enter a password of at least 10 characters").isLength({
       min: 10
     })
