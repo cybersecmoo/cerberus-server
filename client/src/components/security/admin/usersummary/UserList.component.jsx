@@ -45,7 +45,7 @@ class UserList extends Component {
         <div className="users">
           <h3>Users</h3>
           <ListGroup className="user-list">
-            {this.props.allUsers.map(item => (
+            {users.map(item => (
               <UserSummary key={item._id} user={item}></UserSummary>
             ))}
           </ListGroup>

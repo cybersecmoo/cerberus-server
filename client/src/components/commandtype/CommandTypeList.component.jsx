@@ -45,7 +45,7 @@ class CommandTypeList extends Component {
         <div className="commandTypes">
           <h3>Command Types</h3>
           <ListGroup className="commandTypes-list">
-            {this.props.allCommands.map(item => (
+            {commandTypes.map(item => (
               <CommandType key={item._id} commandType={item}></CommandType>
             ))}
           </ListGroup>

@@ -35,8 +35,24 @@ router.post("/", standardAuth, async (req, res) => {
   }
 });
 
+router.get("/types", standardAuth, async (req, res) => {
+  let jsonPayload = { allCommandTypes: [], errors: [] };
+  let returnCode = 200;
+  try {
+    const allCommandTypes = await CommandType.find({});
+
+    jsonPayload = { allCommandTypes, errors: jsonPayload.errors };
+  } catch (error) {
+    logMessage("ERROR", "Server error in getting command types: " + error);
+    returnCode = 500;
+    jsonPayload.errors = [{ msg: "Server Error" }];
+  } finally {
+    return res.status(returnCode).json(jsonPayload);
+  }
+});
+
 // Create a new type of command
-router.post("/create", standardAuth, async (req, res) => {
+router.post("/types/create", standardAuth, async (req, res) => {
   const { name, argsCount } = req.body;
 
   try {
@@ -56,5 +72,7 @@ router.post("/create", standardAuth, async (req, res) => {
     res.status(500).json({ errors: [{ msg: "Failed to create command type" }] });
   }
 });
+
+router.delete("/types/:id", standardAuth, async (req, res) => {});
 
 module.exports = router;

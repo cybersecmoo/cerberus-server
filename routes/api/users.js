@@ -107,7 +107,7 @@ router.delete("/:id", [standardAuth, adminAuth], async (req, res) => {
 });
 
 router.get("/", [standardAuth, adminAuth], async (req, res) => {
-  let jsonPayload = { user: "", errors: [] };
+  let jsonPayload = { allUsers: [], errors: [] };
   let returnCode = 200;
 
   try {
