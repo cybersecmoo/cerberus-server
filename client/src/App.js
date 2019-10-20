@@ -7,6 +7,7 @@ import Login from "./components/security/authentication/login/Login.component";
 import UserList from "./components/security/admin/usersummary/UserList.component";
 import ChangePassword from "./components/security/authentication/changepassword/ChangePassword.component";
 import AlertBar from "./components/alert/AlertBar.component";
+import CommandTypeList from "./components/commandtype/CommandTypeList.component";
 import PrivateRoute from "./components/security/authentication/privateroute/PrivateRoute.component";
 
 import Container from "react-bootstrap/Container";
@@ -24,6 +25,7 @@ class App extends Component {
             <Route exact path="/update-password" component={ChangePassword} />
             <PrivateRoute exact path="/" component={HomePage} />
             <PrivateRoute exact path="/user-management" component={UserList} />
+            <PrivateRoute exact path="/command-management" component={CommandTypeList} />
           </Switch>
         </Container>
       </div>

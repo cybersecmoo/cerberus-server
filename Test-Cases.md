@@ -26,6 +26,7 @@
  - [ ] Queue a new command (of a couple different types) successfully
  - [ ] Invalid command-queueing
  - [ ] Create a new command type
+ - [ ] Invalid new command (trying to create one with a decimal/negative arg count)
 
 ## Heartbeats/Targets ##
 

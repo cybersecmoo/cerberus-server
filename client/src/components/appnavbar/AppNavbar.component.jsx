@@ -22,6 +22,7 @@ class AppNavbar extends Component {
     );
     let userManLink = null;
     let changePasswordLink = null;
+    let commandManLink = null;
     const auth = this.props.auth;
 
     if (auth.isAuthenticated) {
@@ -34,6 +35,12 @@ class AppNavbar extends Component {
       changePasswordLink = (
         <Link className="nav-link" to="/update-password">
           Change Password
+        </Link>
+      );
+
+      commandManLink = (
+        <Link className="nav-link" to="command-management">
+          Manage Commands
         </Link>
       );
     }
@@ -53,9 +60,7 @@ class AppNavbar extends Component {
         </Link>
         <Nav className="mr-auto">
           {loginLink}
-          <Link className="nav-link" to="/">
-            Manage Command Types
-          </Link>
+          {commandManLink}
           {userManLink}
           {changePasswordLink}
         </Nav>

@@ -7,8 +7,8 @@ import Button from "react-bootstrap/Button";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
-import { setAlert } from "../../../../redux/alert/alert.action";
-import { deleteCommandType } from "../../../../redux/users/users.action";
+import { setAlert } from "../../redux/alert/alert.action";
+import { deleteCommandType } from "../../redux/commands/commands.action";
 
 class CommandType extends Component {
   deleteClicked = async event => {
@@ -22,6 +22,7 @@ class CommandType extends Component {
   };
 
   render() {
+    // TODO: Improve the styling so that the names and args and delete buttons all line up
     return (
       <ListGroup.Item eventKey={this.props.key} variant="dark">
         <span className="cell">
@@ -30,7 +31,7 @@ class CommandType extends Component {
         </span>
         <span className="cell">
           <b>Args: </b>
-          {this.props.commandType.numArgs}
+          {this.props.commandType.argsCount}
         </span>
         <Button variant="danger" onClick={this.deleteClicked}>
           Delete

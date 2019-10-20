@@ -49,7 +49,9 @@ router.post(
   [
     check("name", "Name is required")
       .not()
-      .isEmpty(),
+      .isEmpty()
+      .trim()
+      .escape(),
     check("password", "Enter a password of at least 10 characters").isLength({
       min: 10
     })
@@ -107,7 +109,7 @@ router.delete("/:id", [standardAuth, adminAuth], async (req, res) => {
 });
 
 router.get("/", [standardAuth, adminAuth], async (req, res) => {
-  let jsonPayload = { user: "", errors: [] };
+  let jsonPayload = { allUsers: [], errors: [] };
   let returnCode = 200;
 
   try {

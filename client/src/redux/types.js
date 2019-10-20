@@ -1,9 +1,15 @@
 export const SET_ALERT = "SET_ALERT";
 export const REMOVE_ALERT = "REMOVE_ALERT";
+
 export const LOGIN = "LOGIN";
 export const LOGOUT = "LOGOUT";
 export const LOCAL_LOGOUT = "LOCAL_LOGOUT";
+
 export const DELETE_USER = "DELETE_USER";
 export const FETCH_USERS = "FETCH_USERS";
 export const CREATE_USER = "CREATE_USER";
 export const CHANGE_PASSWORD = "CHANGE_PASSWORD";
+
+export const DELETE_COMMAND_TYPE = "DELETE_COMMAND_TYPE";
+export const FETCH_COMMAND_TYPES = "FETCH_COMMAND_TYPES";
+export const CREATE_COMMAND_TYPE = "CREATE_COMMAND_TYPE";
