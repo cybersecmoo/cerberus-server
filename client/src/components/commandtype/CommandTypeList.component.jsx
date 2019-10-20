@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import CommandType from "./CommandType.component";
-import "./UserList.style.scss";
+import "./CommandTypeList.style.scss";
 import ListGroup from "react-bootstrap/ListGroup";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import { fetchCommands } from "../../../../redux/users/users.action";
-import { setAlert } from "../../../../redux/alert/alert.action";
+import { fetchCommandTypes } from "../../redux/commands/commands.action";
+import { setAlert } from "../../redux/alert/alert.action";
 import NewCommandType from "./NewCommandType.component";
 
 import { connect } from "react-redux";
@@ -22,7 +22,7 @@ class CommandTypeList extends Component {
   }
 
   async componentDidMount() {
-    await this.props.fetchUsers();
+    await this.props.fetchCommandTypes();
   }
 
   handleShow() {
@@ -38,7 +38,7 @@ class CommandTypeList extends Component {
   }
 
   render() {
-    const commandTypes = this.props.allCommands;
+    const commandTypes = this.props.allCommandTypes;
 
     if (commandTypes && commandTypes !== null && commandTypes.length > 0) {
       return (
@@ -65,16 +65,16 @@ class CommandTypeList extends Component {
 }
 
 CommandTypeList.propTypes = {
-  allCommands: PropTypes.array.isRequired,
-  fetchCommands: PropTypes.func.isRequired,
+  allCommandTypes: PropTypes.array.isRequired,
+  fetchCommandTypes: PropTypes.func.isRequired,
   setAlert: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  allCommands: state.commands.allCommands
+  allCommandTypes: state.commands.allCommandTypes
 });
 
 export default connect(
   mapStateToProps,
-  { fetchCommands, setAlert }
+  { fetchCommandTypes, setAlert }
 )(CommandTypeList);
