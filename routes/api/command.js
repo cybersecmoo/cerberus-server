@@ -103,6 +103,26 @@ router.post(
   }
 );
 
-router.delete("/types/:id", standardAuth, async (req, res) => {});
+router.delete("/types/:id", standardAuth, async (req, res) => {
+  let jsonPayload = { success: false, errors: [] };
+  let returnCode = 200;
+
+  try {
+    const removed = await CommandType.findByIdAndDelete(req.params.id);
+
+    if (removed === undefined || removed === null) {
+      returnCode = 500;
+      jsonPayload = { success: false, errors: [{ msg: `Could not remove command type with id ${req.params.id}` }] };
+    } else {
+      jsonPayload = { success: true, errors: jsonPayload.errors };
+    }
+  } catch (error) {
+    logMessage("ERROR", "Server error in deleting command type: " + error);
+    returnCode = 500;
+    jsonPayload.errors = [{ msg: "Server Error" }];
+  } finally {
+    return res.status(returnCode).json(jsonPayload);
+  }
+});
 
 module.exports = router;

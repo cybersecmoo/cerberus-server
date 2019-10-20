@@ -54,7 +54,7 @@ export const fetchCommandTypes = () => async dispatch => {
   }
 };
 
-export const createCommandType = ({ name, numArgs }) => async dispatch => {
+export const createCommandType = ({ name, argsCount }) => async dispatch => {
   const config = {
     ...axiosConfig,
     headers: {
@@ -64,14 +64,14 @@ export const createCommandType = ({ name, numArgs }) => async dispatch => {
   };
 
   try {
-    const data = { name, numArgs };
-    const response = await axios.post("/api/commands/types/create", data, config);
+    const data = { name, argsCount };
+    const response = await axios.post("/api/commands/types/", data, config);
     const errors = response.data.errors;
 
     if (errors.length !== 0) {
       errors.forEach(error => dispatch(setAlert(error.msg, "danger")));
     } else {
-      dispatch(setAlert(`Added user ${name}`, "success"));
+      dispatch(setAlert(`Added command ${name}`, "success"));
       dispatch({
         type: CREATE_COMMAND_TYPE,
         payload: response.data.commandType
